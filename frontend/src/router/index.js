@@ -1,16 +1,16 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import Vue from "vue";
+import Router from "vue-router";
 
-import Noter from '@/components/noter/Noter';
+import Noter from "@/components/noter/Noter";
 
 Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
+  mode: "history",
   routes: [
     {
-      path: '/',
-      name: 'noter',
+      path: "/",
+      name: "noter",
       component: Noter
     }
   ]

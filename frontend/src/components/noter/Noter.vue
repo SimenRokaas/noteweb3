@@ -8,17 +8,21 @@
 </template>
 
 <script>
-import NoteService from '../../service/NoteService';
+import NoteService from "../../service/NoteService";
 
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
 
 export default {
   name: "Noter",
+  components: {
+    DataTable,
+    Column
+  },
   data() {
     return {
       noter: null
-    }
+    };
   },
   noteService: null,
   created() {
@@ -26,11 +30,7 @@ export default {
   },
   mounted() {
     //this.noteService.fetchNoter().then(data => this.noter = data);
-    this.noter = this.noteService.fetchNoter()
-  },
-  components: {
-    DataTable,
-    Column
+    this.noter = this.noteService.fetchNoter();
   }
-}
+};
 </script>
