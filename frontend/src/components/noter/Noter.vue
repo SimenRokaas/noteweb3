@@ -1,9 +1,14 @@
 <template>
   <DataTable :value="noter">
-    <Column field="id" header="ID"></Column>
-    <Column field="year" header="Year"></Column>
-    <Column field="tittel" header="Tittel"></Column>
-    <Column field="color" header="Color"></Column>
+    <Column field="arkivNr" header="Arkivnr"></Column>
+    <Column field="tittel1" header="Tittel"></Column>
+    <Column field="tittel2" header="Tittel 2"></Column>
+    <Column field="soloInstrument" header="Solo-instrument"></Column>
+    <Column field="durata" header="Durata"></Column>
+    <Column field="kategori1" header="Kategori"></Column>
+    <Column field="kategori2" header="Kategori 2"></Column>
+    <Column field="kategori3" header="Kategori 3"></Column>
+    <Column field="kommentar" header="Kommentar"></Column>
   </DataTable>
 </template>
 
@@ -21,16 +26,14 @@ export default {
   },
   data() {
     return {
-      noter: null
+      noter: []
     };
   },
-  noteService: null,
-  created() {
-    this.noteService = new NoteService();
-  },
   mounted() {
-    //this.noteService.fetchNoter().then(data => this.noter = data);
-    this.noter = this.noteService.fetchNoter();
+    NoteService.fetchNoter().then(data => {
+      console.log(data.noter[0]);
+      this.noter = data.noter;
+    });
   }
 };
 </script>
