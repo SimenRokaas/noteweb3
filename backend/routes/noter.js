@@ -4,7 +4,7 @@ const router = express.Router();
 const pool = require("../database");
 
 const dummyNoter = require('../dummynoter.json');
-const useDummy = true;
+const useDummy = false;
 
 router.get('/list', (req, res) => {
   if (useDummy) {
