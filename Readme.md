@@ -3,7 +3,28 @@
 ![alt text](vue-node-express-mysql-architecture.png "Architecture")
 
 ### Backend
-Node + Express + MySql
+Node + Express + Cors + MySql
 
 ### Frontend
 PrimeVue + Axios
+
+### Teste prod-bygg lokalt
+Frontend bygges med NODE_ENV=development slik at API-kall går til localhost:3000
+
+Backend kjøres lokalt med NODE_ENV=production slik at frontend serves fra dist-folder.
+
+    cd frontend
+    npm run build-dev // bygger frontend/dist med NODE_ENV=development
+    cd ../backend
+    npm run prod-local // kjører med NODE_ENV=production
+
+### Oppdatere på server
+Frontend bygges med NODE_ENV=production slik at API-kall går til https://tjk.no/noter
+
+Backend kjøres (på server) med NODE_ENV=production slik at frontend serves fra dist-folder.
+
+    cd frontend
+    npm run build // bygger med NODE_ENV=production
+
+1. Last opp backend-katalogen + frontend/dist til server
+1. Sjekk oppsett på server - se node.js setup på webhotell (A2 hosting)
