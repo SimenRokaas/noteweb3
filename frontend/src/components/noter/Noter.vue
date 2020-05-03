@@ -21,8 +21,10 @@
     <template #header>
       <table>
         <tr>
-          <td style="float: left">TJK Notearkiv</td>
-          <td>
+          <td style="float: left; margin-right: 8px">
+            TJK Notearkiv
+          </td>
+          <td style="float: left">
             <i class="pi pi-search"></i>
             <InputText
               v-model="filters['global']"
@@ -30,14 +32,28 @@
               size="50"
             />
           </td>
-          <td>
+          <td style="float: right;">
+            <Checkbox
+              id="kanSkrive"
+              v-model="kanSkrive"
+              :binary="true"
+              :disabled="true"
+            />
+            <label
+              for="kanSkrive"
+              class="p-checkbox-label"
+              style="font-size: 14px; margin-right: 4px"
+            >
+              Kan skrive
+            </label>
             <Checkbox id="showAllCols" v-model="showAllCols" :binary="true" />
             <label
               for="showAllCols"
               class="p-checkbox-label"
-              style="font-size: 14px"
-              >Vis alle kolonner</label
+              style="font-size: 14px; margin-right: 4px"
             >
+              Vis alle kolonner
+            </label>
             <Button
               style="float: right"
               icon="pi pi-external-link"
@@ -54,19 +70,20 @@
     <template #loading>
       Laster noter, vent litt...
     </template>
-    <Column field="arkivNr" header="Arkivnr" :sortable="true"></Column>
+    <Column field="arkivNr" header="Arkivnr" :sortable="true" />
     <Column
       v-for="col of columns"
       :key="col.field"
       :field="col.field"
       :header="col.header"
       :sortable="true"
-    ></Column>
+    />
   </DataTable>
 </template>
 
 <script>
-import NoteService from "../../service/NoteService";
+import NoteService from "@/service/NoteService";
+import RolleService from "@/service/RolleService";
 
 const kolTittel1 = { field: "tittel1", header: "Tittel" };
 const kolTittel2 = { field: "tittel2", header: "Tittel 2" };
@@ -97,7 +114,8 @@ export default {
       showAllCols: false,
       filters: {},
       loading: true,
-      noter: []
+      noter: [],
+      kanSkrive: false
     };
   },
   computed: {
@@ -112,6 +130,10 @@ export default {
     NoteService.fetchNoter().then(data => {
       this.noter = data;
       this.loading = false;
+    });
+    // hvis vi kan nå en styre-side på tjk.no så har vi skrive-rettighet
+    RolleService.fetchRolle().then(data => {
+      this.kanSkrive = data;
     });
   },
   methods: {

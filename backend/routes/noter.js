@@ -1,25 +1,27 @@
-const express = require('express');
+"use strict";
+
+const express = require("express");
 const router = express.Router();
 
 const pool = require("../database");
 
-const dummyNoter = require('../dummynoter.json');
+const dummyNoter = require("../dummynoter.json");
 const useDummy = false;
 
-router.get('/list', (req, res) => {
+router.get("/list", (req, res) => {
   if (useDummy) {
     console.log("Sender dummy-noter!");
     res.send({
       noter: dummyNoter
     });
   } else {
-    pool.query("select * from noter", function (error, noter) {
+    pool.query("select * from noter", function(error, noter) {
       if (error) {
         console.error(error);
       }
       res.send({
         noter: noter
-      })
+      });
     });
   }
 });
