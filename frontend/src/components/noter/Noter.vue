@@ -1,90 +1,126 @@
 <template>
-  <DataTable
-    ref="dt"
-    class="p-datatable-noter"
-    :value="noter"
-    :filters="filters"
-    :loading="loading"
-    auto-layout
-    sort-field="arkivNr"
-    :sort-order="-1"
-    :rows="15"
-    :rows-per-page-options="[15, 30, 60, 100]"
-    :row-hover="true"
-    :paginator="true"
-    paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-    current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
-    :resizable-columns="true"
-    export-filename="noter"
-    csv-separator=";"
-  >
-    <template #header>
-      <table>
-        <tr>
-          <td style="float: left; margin-right: 8px">
-            TJK Notearkiv
-          </td>
-          <td style="float: left">
-            <i class="pi pi-search"></i>
-            <InputText
-              v-model="filters['global']"
-              placeholder="Fritekst søk"
-              size="50"
-            />
-          </td>
-          <td style="float: right;">
-            <Checkbox
-              id="kanSkrive"
-              v-model="kanSkrive"
-              :binary="true"
-              :disabled="true"
-            />
-            <label
-              for="kanSkrive"
-              class="p-checkbox-label"
-              style="font-size: 14px; margin-right: 4px"
-            >
-              Kan skrive
-            </label>
-            <Checkbox id="showAllCols" v-model="showAllCols" :binary="true" />
-            <label
-              for="showAllCols"
-              class="p-checkbox-label"
-              style="font-size: 14px; margin-right: 4px"
-            >
-              Vis alle kolonner
-            </label>
-            <Button
-              style="float: right"
-              icon="pi pi-external-link"
-              label="Eksport"
-              @click="exportCSV($event)"
-            />
-          </td>
-        </tr>
-      </table>
-    </template>
-    <template #empty>
-      Ingen treff.
-    </template>
-    <template #loading>
-      Laster noter, vent litt...
-    </template>
-    <Column field="arkivNr" header="Arkivnr" :sortable="true" />
-    <Column
-      v-for="col of columns"
-      :key="col.field"
-      :field="col.field"
-      :header="col.header"
-      :sortable="true"
-    />
-  </DataTable>
+  <div>
+    <DataTable
+      ref="dt"
+      class="p-datatable-noter"
+      :value="noter"
+      :filters="filters"
+      :loading="loading"
+      auto-layout
+      sort-field="arkivNr"
+      :sort-order="-1"
+      :rows="15"
+      :rows-per-page-options="[15, 30, 60, 100]"
+      :row-hover="true"
+      :paginator="true"
+      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+      current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
+      :resizable-columns="true"
+      export-filename="noter"
+      csv-separator=";"
+      selection-mode="single"
+      :selection.sync="valgtNote"
+      @row-select="onRowSelect"
+      dataKey="arkivNr"
+    >
+      <template #header>
+        <table>
+          <tr>
+            <td style="float: left; margin-right: 8px">
+              TJK Notearkiv
+            </td>
+            <td style="float: left">
+              <i class="pi pi-search"></i>
+              <InputText
+                v-model="filters['global']"
+                placeholder="Fritekst søk"
+                size="50"
+              />
+            </td>
+            <td style="float: right;">
+              <span v-if="erDev">
+                <Checkbox id="toggleKanSkrive" v-model="kanSkrive" :binary="true" />
+                <label
+                    for="toggleKanSkrive"
+                    class="p-checkbox-label"
+                    style="font-size: 9px; margin-right: 4px"
+                >
+                  Kan skrive (DEV)
+                </label>
+              </span>
+              <Checkbox id="showAllCols" v-model="showAllCols" :binary="true" />
+              <label
+                  for="showAllCols"
+                  class="p-checkbox-label"
+                  style="font-size: 14px; margin-right: 4px"
+              >
+                Vis alle kolonner
+              </label>
+              <Button
+                  icon="pi pi-plus"
+                  label="Legg til"
+                  @click="leggTilNote"
+                  style="margin-right: 4px"
+                  v-show="kanSkrive"
+                  class="p-button-success"
+              />
+              <Button
+                  icon="pi pi-external-link"
+                  label="Eksport"
+                  @click="exportCSV($event)"
+                  class="p-button-success"
+              />
+            </td>
+          </tr>
+        </table>
+      </template>
+      <template #empty>
+        Ingen treff.
+      </template>
+      <template #loading>
+        Laster noter, vent litt...
+      </template>
+      <Column
+        v-for="col of columns"
+        :key="col.field"
+        :field="col.field"
+        :header="col.header"
+        :sortable="true"
+      />
+    </DataTable>
+
+    <Dialog :visible.sync="visDialog" :style="{width: '600px'}" header="Notedetaljer" :modal="true">
+      <div class="p-grid p-fluid" v-if="dialogNote">
+
+        <div v-for="col in allColumns">
+          <div style="margin-bottom: 5px">
+            <label :for="col.field">{{col.header}}</label>
+            <InputText :id="col.field" v-model="dialogNote[col.field]" :disabled="!kanSkrive" autocomplet="off" />
+          </div>
+        </div>
+
+      </div>
+
+      <template #footer>
+        <div v-if="kanSkrive">
+          <Button v-if="visSlettKnapp" label="Slett" icon="pi pi-times" @click="slettNote" class="p-button-danger" />
+          <Button v-if="visAvbrytKnapp" label="Avbryt" icon="pi pi-times" @click="visDialog = false" class="p-button-danger" />
+          <Button label="Lagre" icon="pi pi-check" @click="lagreNote" class="p-button-success" />
+        </div>
+        <div v-else>
+          <Button label="OK" icon="pi pi-check" @click="visDialog = false" class="p-button-success" />
+        </div>
+      </template>
+
+    </Dialog>
+  </div>
 </template>
 
 <script>
 import NoteService from "@/service/NoteService";
 import RolleService from "@/service/RolleService";
 
+const arkivNr = { field: "arkivNr", header: "Arkivnr" };
 const kolTittel1 = { field: "tittel1", header: "Tittel" };
 const kolTittel2 = { field: "tittel2", header: "Tittel 2" };
 const kolSolo = { field: "soloInstrument", header: "Solo-instr" };
@@ -95,6 +131,7 @@ const kolKategori3 = { field: "kategori3", header: "Kategori 3" };
 const kolKommentar = { field: "kommentar", header: "Kommentar" };
 
 const allCols = [
+  arkivNr,
   kolTittel1,
   kolTittel2,
   kolSolo,
@@ -104,18 +141,25 @@ const allCols = [
   kolKategori3,
   kolKommentar
 ];
-const minCols = [kolTittel1, kolKategori1, kolKommentar];
+const minCols = [arkivNr, kolTittel1, kolKategori1, kolKommentar];
 
 export default {
   name: "Noter",
   data() {
     return {
       columnOptions: null,
+      allColumns: allCols,
       showAllCols: false,
       filters: {},
       loading: true,
       noter: [],
-      kanSkrive: false
+      kanSkrive: false,
+      valgtNote: null,
+      dialogNote: null,
+      visDialog: false,
+      visSlettKnapp: true,
+      visAvbrytKnapp: false,
+      erDev: process.env.NODE_ENV === 'development'
     };
   },
   computed: {
@@ -139,6 +183,35 @@ export default {
   methods: {
     exportCSV() {
       this.$refs.dt.exportCSV();
+    },
+    onRowSelect(event) {
+      this.dialogNote = {...event.data};
+      this.visSlettKnapp = true;
+      this.visAvbrytKnapp = false;
+      this.visDialog = true;
+    },
+    leggTilNote() {
+      this.dialogNote = {
+        arkivNr: this.genererArkivnr(),
+        tittel1: ''
+      };
+      this.visSlettKnapp = false;
+      this.visAvbrytKnapp = true;
+      this.visDialog = true;
+    },
+    slettNote() {
+      this.visDialog = false;
+      this.dialogNote = null;
+      this.valgtNote = null;
+    },
+    lagreNote() {
+      this.visDialog = false;
+      this.dialogNote = null;
+      this.valgtNote = null;
+    },
+    genererArkivnr() {
+      let currentMax = Math.max(...this.noter.map(n => n.arkivNr));
+      return currentMax + 1;
     }
   }
 };
