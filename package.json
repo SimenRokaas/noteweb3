@@ -4,9 +4,9 @@
   "description": "TjkNoter backend",
   "main": "app.js",
   "scripts": {
-    "start": "node_modules/.bin/cross-env NODE_ENV=development ./node_modules/nodemon/bin/nodemon.js app.js",
-    "prod-local": "node_modules/.bin/cross-env NODE_ENV=production node app.js",
-    "debug": "node_modules/.bin/cross-env NODE_ENV=development node --inspect app.js",
+    "start": "cross-env NODE_ENV=development nodemon app.js",
+    "prod-local": "cross-env NODE_ENV=production node app.js",
+    "debug": "cross-env NODE_ENV=development node --inspect app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
-    "nodemon": "^2.0.3"
+    "nodemon": "^2.0.4"
   }
 }

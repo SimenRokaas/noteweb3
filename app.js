@@ -33,7 +33,7 @@ app.use("/rolle", require("./routes/rolle"));
 console.log("Env: " + process.env.NODE_ENV);
 if (process.env.NODE_ENV !== "development") {
   // configure express to use public folder
-  const publicRoot = "../frontend/dist";
+  const publicRoot = "frontend/dist";
   app.use(express.static(publicRoot));
   app.get("/", (req, res) => {
     res.sendFile("index.html", { root: publicRoot });
