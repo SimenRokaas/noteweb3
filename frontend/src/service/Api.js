@@ -2,9 +2,9 @@ import axios from "axios";
 
 export default () => {
   const apiUrl =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : "https://tjk.no/noter";
+    process.env.VUE_APP_LOCAL_SERVER === "true"
+      ? "http://localhost:57462"
+      : "https://notearkiv.tjk.no";
 
   return axios.create({
     baseURL: apiUrl,

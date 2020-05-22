@@ -27,7 +27,7 @@
         <table>
           <tr>
             <td style="float: left; margin-right: 8px">
-              TJK Notearkiv
+              {{ title }}
             </td>
             <td style="float: left">
               <i class="pi pi-search"></i>
@@ -39,36 +39,40 @@
             </td>
             <td style="float: right;">
               <span v-if="erDev">
-                <Checkbox id="toggleKanSkrive" v-model="kanSkrive" :binary="true" />
+                <Checkbox
+                  id="toggleKanSkrive"
+                  v-model="kanSkrive"
+                  :binary="true"
+                />
                 <label
-                    for="toggleKanSkrive"
-                    class="p-checkbox-label"
-                    style="font-size: 9px; margin-right: 4px"
+                  for="toggleKanSkrive"
+                  class="p-checkbox-label"
+                  style="font-size: 9px; margin-right: 4px"
                 >
                   Kan skrive (DEV)
                 </label>
               </span>
               <Checkbox id="showAllCols" v-model="showAllCols" :binary="true" />
               <label
-                  for="showAllCols"
-                  class="p-checkbox-label"
-                  style="font-size: 14px; margin-right: 4px"
+                for="showAllCols"
+                class="p-checkbox-label"
+                style="font-size: 14px; margin-right: 4px"
               >
                 Vis alle kolonner
               </label>
               <Button
-                  icon="pi pi-plus"
-                  label="Legg til"
-                  @click="leggTilNote"
-                  style="margin-right: 4px"
-                  v-show="kanSkrive"
-                  class="p-button-success"
+                icon="pi pi-plus"
+                label="Legg til"
+                @click="leggTilNote"
+                style="margin-right: 4px"
+                v-show="kanSkrive"
+                class="p-button-success"
               />
               <Button
-                  icon="pi pi-external-link"
-                  label="Eksport"
-                  @click="exportCSV($event)"
-                  class="p-button-success"
+                icon="pi pi-external-link"
+                label="Eksport"
+                @click="exportCSV($event)"
+                class="p-button-success"
               />
             </td>
           </tr>
@@ -89,29 +93,58 @@
       />
     </DataTable>
 
-    <Dialog :visible.sync="visDialog" :style="{width: '600px'}" header="Notedetaljer" :modal="true">
+    <Dialog
+      :visible.sync="visDialog"
+      :style="{ width: '600px' }"
+      header="Notedetaljer"
+      :modal="true"
+    >
       <div class="p-grid p-fluid" v-if="dialogNote">
-
         <div v-for="col in allColumns">
           <div style="margin-bottom: 5px">
-            <label :for="col.field">{{col.header}}</label>
-            <InputText :id="col.field" v-model="dialogNote[col.field]" :disabled="!kanSkrive" autocomplet="off" />
+            <label :for="col.field">{{ col.header }}</label>
+            <InputText
+              :id="col.field"
+              v-model="dialogNote[col.field]"
+              :disabled="!kanSkrive"
+              autocomplet="off"
+            />
           </div>
         </div>
-
       </div>
 
       <template #footer>
         <div v-if="kanSkrive">
-          <Button v-if="visSlettKnapp" label="Slett" icon="pi pi-times" @click="slettNote" class="p-button-danger" />
-          <Button v-if="visAvbrytKnapp" label="Avbryt" icon="pi pi-times" @click="visDialog = false" class="p-button-danger" />
-          <Button label="Lagre" icon="pi pi-check" @click="lagreNote" class="p-button-success" />
+          <Button
+            v-if="visSlettKnapp"
+            label="Slett"
+            icon="pi pi-times"
+            @click="slettNote"
+            class="p-button-danger"
+          />
+          <Button
+            v-if="visAvbrytKnapp"
+            label="Avbryt"
+            icon="pi pi-times"
+            @click="visDialog = false"
+            class="p-button-danger"
+          />
+          <Button
+            label="Lagre"
+            icon="pi pi-check"
+            @click="lagreNote"
+            class="p-button-success"
+          />
         </div>
         <div v-else>
-          <Button label="OK" icon="pi pi-check" @click="visDialog = false" class="p-button-success" />
+          <Button
+            label="OK"
+            icon="pi pi-check"
+            @click="visDialog = false"
+            class="p-button-success"
+          />
         </div>
       </template>
-
     </Dialog>
   </div>
 </template>
@@ -147,6 +180,7 @@ export default {
   name: "Noter",
   data() {
     return {
+      title: process.env.VUE_APP_TITLE,
       columnOptions: null,
       allColumns: allCols,
       showAllCols: false,
@@ -155,11 +189,11 @@ export default {
       noter: [],
       kanSkrive: false,
       valgtNote: null,
-      dialogNote: null,
+      dialogNote: {},
       visDialog: false,
       visSlettKnapp: true,
       visAvbrytKnapp: false,
-      erDev: process.env.NODE_ENV === 'development'
+      erDev: process.env.NODE_ENV === "development"
     };
   },
   computed: {
@@ -171,6 +205,7 @@ export default {
     this.columnOptions = this.showAllCols ? allCols : minCols;
   },
   mounted() {
+    this.title = process.env.VUE_APP_TITLE;
     NoteService.fetchNoter().then(data => {
       this.noter = data;
       this.loading = false;
@@ -185,7 +220,7 @@ export default {
       this.$refs.dt.exportCSV();
     },
     onRowSelect(event) {
-      this.dialogNote = {...event.data};
+      this.dialogNote = { ...event.data };
       this.visSlettKnapp = true;
       this.visAvbrytKnapp = false;
       this.visDialog = true;
@@ -193,7 +228,7 @@ export default {
     leggTilNote() {
       this.dialogNote = {
         arkivNr: this.genererArkivnr(),
-        tittel1: ''
+        tittel1: ""
       };
       this.visSlettKnapp = false;
       this.visAvbrytKnapp = true;

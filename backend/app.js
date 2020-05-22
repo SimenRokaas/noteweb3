@@ -13,8 +13,6 @@ conn.query("select count(*) as antall from noter", function(error, antall) {
 });
 
 // configure middleware
-const port = 3000;
-app.set("port", process.env.port || port); // set express to use this port
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // parse form data client
 // CORS: must allow requests from frontend (only in development)
@@ -41,6 +39,12 @@ if (process.env.NODE_ENV !== "development") {
     res.sendFile("index.html", { root: publicRoot });
   });
 }
-app.listen(port, () =>
-  console.log(`TJK Notearkiv server kjører på port ${port}.`)
-);
+const port = process.env.port || 57462;
+app.set("port", port); // set express to use this port
+app.listen(port, () => {
+  if (typeof PhusionPassenger !== "undefined") {
+    console.log(`TJK Notearkiv server kjører i Passenger.`);
+  } else {
+    console.log(`TJK Notearkiv server kjører på port ${port}.`);
+  }
+});

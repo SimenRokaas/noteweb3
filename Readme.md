@@ -9,7 +9,7 @@ Node + Express + Cors + MySql
 PrimeVue + Axios
 
 ### Teste prod-bygg lokalt
-Frontend bygges med NODE_ENV=development slik at API-kall går til localhost:3000
+Frontend bygges med NODE_ENV=development slik at API-kall går til localhost
 
 Backend kjøres lokalt med NODE_ENV=production slik at frontend serves fra dist-folder.
 
@@ -19,7 +19,7 @@ Backend kjøres lokalt med NODE_ENV=production slik at frontend serves fra dist-
     npm run prod-local // kjører med NODE_ENV=production
 
 ### Oppdatere på server
-Frontend bygges med NODE_ENV=production slik at API-kall går til https://tjk.no/noter
+Frontend bygges med NODE_ENV=production slik at API-kall går til https://tjk.no/notearkiv/noter
 
 Backend kjøres (på server) med NODE_ENV=production slik at frontend serves fra dist-folder.
 
