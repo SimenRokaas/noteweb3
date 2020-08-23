@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Toast position="top-center" />
     <DataTable
       ref="dt"
       class="p-datatable-noter"
@@ -17,7 +18,7 @@
       current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
       :resizable-columns="true"
       export-filename="noter"
-      csv-separator=";"
+      csv-separator="|"
       selection-mode="single"
       :selection.sync="valgtNote"
       @row-select="onRowSelect"
@@ -106,8 +107,8 @@
             <InputText
               :id="col.field"
               v-model="dialogNote[col.field]"
-              :disabled="!kanSkrive"
-              autocomplet="off"
+              :disabled="!kanSkrive || col.field === 'arkivNr'"
+              autocomplete="off"
             />
           </div>
         </div>
@@ -220,7 +221,7 @@ export default {
       this.$refs.dt.exportCSV();
     },
     onRowSelect(event) {
-      this.dialogNote = { ...event.data };
+      this.dialogNote = event.data;
       this.visSlettKnapp = true;
       this.visAvbrytKnapp = false;
       this.visDialog = true;
@@ -240,6 +241,24 @@ export default {
       this.valgtNote = null;
     },
     lagreNote() {
+      NoteService.update(this.dialogNote)
+        .then(res => {
+          var data = JSON.parse(res.config.data);
+          this.$toast.add({
+            severity: "success",
+            summary: "Oppdatert",
+            detail: "Note " + data.arkivNr + " oppdatert!",
+            life: 3000
+          });
+        })
+        .catch(error => {
+          this.$toast.add({
+            severity: "error",
+            summary: "Feil",
+            detail: error,
+            life: 3000
+          });
+        });
       this.visDialog = false;
       this.dialogNote = null;
       this.valgtNote = null;

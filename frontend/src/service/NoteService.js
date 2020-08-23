@@ -6,4 +6,10 @@ export default class NoteService {
       .get("noter/list")
       .then(res => res.data.noter);
   }
+
+  static update(note) {
+    return Api()
+      .put("/noter/" + note.arkivNr, note)
+      .then(res => res);
+  }
 }
