@@ -117,17 +117,18 @@
       <template #footer>
         <div v-if="kanSkrive">
           <Button
-            v-if="visSlettKnapp"
-            label="Slett"
-            icon="pi pi-times"
-            @click="slettNote"
-            class="p-button-danger"
-          />
-          <Button
             v-if="visAvbrytKnapp"
             label="Avbryt"
             icon="pi pi-times"
             @click="visDialog = false"
+            class="p-button-warning"
+            autofocus
+          />
+          <Button
+            v-if="visSlettKnapp"
+            label="Slett"
+            icon="pi pi-times"
+            @click="slettNote"
             class="p-button-danger"
           />
           <Button
@@ -221,9 +222,9 @@ export default {
       this.$refs.dt.exportCSV();
     },
     onRowSelect(event) {
-      this.dialogNote = event.data;
+      this.dialogNote = { ...event.data };
       this.visSlettKnapp = true;
-      this.visAvbrytKnapp = false;
+      this.visAvbrytKnapp = true;
       this.visDialog = true;
     },
     leggTilNote() {
@@ -244,6 +245,10 @@ export default {
       NoteService.update(this.dialogNote)
         .then(res => {
           var data = JSON.parse(res.config.data);
+          var indexOfUpdatedNote = this.noter.findIndex(
+            n => n.arkivNr === data.arkivNr
+          );
+          this.noter.splice(indexOfUpdatedNote, 1, data);
           this.$toast.add({
             severity: "success",
             summary: "Oppdatert",
