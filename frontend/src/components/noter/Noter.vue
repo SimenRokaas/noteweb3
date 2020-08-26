@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Toast position="top-center" />
     <DataTable
       ref="dt"
       class="p-datatable-noter"
@@ -195,6 +194,7 @@ export default {
       visDialog: false,
       visSlettKnapp: true,
       visAvbrytKnapp: false,
+      mode: "VIS",
       erDev: process.env.NODE_ENV === "development"
     };
   },
@@ -222,12 +222,14 @@ export default {
       this.$refs.dt.exportCSV();
     },
     onRowSelect(event) {
+      this.mode = "ENDRE";
       this.dialogNote = { ...event.data };
       this.visSlettKnapp = true;
       this.visAvbrytKnapp = true;
       this.visDialog = true;
     },
     leggTilNote() {
+      this.mode = "NY";
       this.dialogNote = {
         arkivNr: this.genererArkivnr(),
         tittel1: ""
@@ -242,31 +244,40 @@ export default {
       this.valgtNote = null;
     },
     lagreNote() {
-      NoteService.update(this.dialogNote)
-        .then(res => {
-          var data = JSON.parse(res.config.data);
-          var indexOfUpdatedNote = this.noter.findIndex(
-            n => n.arkivNr === data.arkivNr
-          );
-          this.noter.splice(indexOfUpdatedNote, 1, data);
-          this.$toast.add({
-            severity: "success",
-            summary: "Oppdatert",
-            detail: "Note " + data.arkivNr + " oppdatert!",
-            life: 3000
-          });
-        })
-        .catch(error => {
-          this.$toast.add({
-            severity: "error",
-            summary: "Feil",
-            detail: error,
-            life: 3000
-          });
-        });
+      if (this.mode === "NY") {
+        NoteService.create(this.dialogNote)
+          .then(res => this.handleSuccess(res, "Opprettet"))
+          .catch(error => this.handleError(error));
+      } else {
+        NoteService.update(this.dialogNote)
+          .then(res => this.handleSuccess(res, "Oppdatert"))
+          .catch(error => this.handleError(error));
+      }
       this.visDialog = false;
       this.dialogNote = null;
       this.valgtNote = null;
+      this.mode = "VIS";
+    },
+    handleSuccess(res, text) {
+      var data = JSON.parse(res.config.data);
+      var indexOfUpdatedNote = this.noter.findIndex(
+        n => n.arkivNr === data.arkivNr
+      );
+      this.noter.splice(indexOfUpdatedNote, 1, data);
+      this.$toast.add({
+        severity: "success",
+        summary: text,
+        detail: "Note " + data.arkivNr + " " + text.toLowerCase() + "!",
+        life: 3000
+      });
+    },
+    handleError(error) {
+      this.$toast.add({
+        severity: "error",
+        summary: "Feil",
+        detail: error,
+        life: 3000
+      });
     },
     genererArkivnr() {
       let currentMax = Math.max(...this.noter.map(n => n.arkivNr));

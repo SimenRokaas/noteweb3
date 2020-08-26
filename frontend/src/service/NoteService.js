@@ -12,4 +12,10 @@ export default class NoteService {
       .put("/noter/" + note.arkivNr, note)
       .then(res => res);
   }
+
+  static create(note) {
+    return Api()
+      .post("/noter", note)
+      .then(res => res);
+  }
 }

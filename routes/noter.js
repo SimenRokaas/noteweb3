@@ -18,19 +18,10 @@ router.get("/list", (req, res) => {
 
 router.put("/:id", (req, res) => {
   var arkivNr = req.params.id;
-  var form_data = {
-    tittel1: req.body.tittel1,
-    tittel2: req.body.tittel2,
-    soloInstrument: req.body.soloInstrument,
-    durata: req.body.durata,
-    kategori1: req.body.kategori1,
-    kategori2: req.body.kategori2,
-    kategori3: req.body.kategori3,
-    kommentar: req.body.kommentar
-  };
+  console.log("Oppdaterer arkivnr " + arkivNr);
   pool.query(
     "update noter set ? where arkivNr = ?",
-    [form_data, arkivNr],
+    [record(req), arkivNr],
     function(error, results) {
       if (error) {
         console.error(JSON.stringify(error));
@@ -40,5 +31,34 @@ router.put("/:id", (req, res) => {
     }
   );
 });
+
+router.post("/", (req, res) => {
+  console.log("Oppretter arkivnr " + req.body.arkivNr);
+  pool.query("insert into noter set ?;", record(req), function(error, results) {
+    if (error) {
+      console.error(JSON.stringify(error));
+      throw error;
+    }
+    res.send(JSON.stringify(results));
+  });
+});
+
+function record(req) {
+  return {
+    arkivNr: blankIfNull(req.body.arkivNr),
+    tittel1: blankIfNull(req.body.tittel1),
+    tittel2: blankIfNull(req.body.tittel2),
+    soloInstrument: blankIfNull(req.body.soloInstrument),
+    durata: blankIfNull(req.body.durata),
+    kategori1: blankIfNull(req.body.kategori1),
+    kategori2: blankIfNull(req.body.kategori2),
+    kategori3: blankIfNull(req.body.kategori3),
+    kommentar: blankIfNull(req.body.kommentar)
+  };
+}
+
+function blankIfNull(str) {
+  return str === undefined ? "" : str;
+}
 
 module.exports = router;
