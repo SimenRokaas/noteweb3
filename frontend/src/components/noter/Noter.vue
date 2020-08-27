@@ -127,7 +127,7 @@
             v-if="visSlettKnapp"
             label="Slett"
             icon="pi pi-times"
-            @click="slettNote"
+            @click="visBekreftSlettDialog"
             class="p-button-danger"
           />
           <Button
@@ -142,6 +142,35 @@
             label="OK"
             icon="pi pi-check"
             @click="visDialog = false"
+            class="p-button-success"
+          />
+        </div>
+      </template>
+    </Dialog>
+
+    <Dialog
+      :visible.sync="visBekreftSlett"
+      :style="{ width: '600px' }"
+      header="Bekreft sletting"
+      :modal="true"
+    >
+      <div class="p-grid p-fluid">
+        Er du sikker på at du vil slette note {{ this.arkNrNaa }}?
+      </div>
+
+      <template #footer>
+        <div>
+          <Button
+            label="Avbryt"
+            icon="pi pi-times"
+            @click="visBekreftSlett = false"
+            class="p-button-warning"
+            autofocus
+          />
+          <Button
+            label="OK"
+            icon="pi pi-check"
+            @click="slettNote"
             class="p-button-success"
           />
         </div>
@@ -194,6 +223,7 @@ export default {
       visDialog: false,
       visSlettKnapp: true,
       visAvbrytKnapp: false,
+      visBekreftSlett: false,
       mode: "VIS",
       arkNrNaa: null,
       erDev: process.env.NODE_ENV === "development"
@@ -241,7 +271,11 @@ export default {
       this.visAvbrytKnapp = true;
       this.visDialog = true;
     },
+    visBekreftSlettDialog() {
+      this.visBekreftSlett = true;
+    },
     slettNote() {
+      this.visBekreftSlett = false;
       NoteService.delete(this.dialogNote)
         .then(res => this.handleSuccess(res, "Slettet"))
         .catch(error => this.handleError(error));
