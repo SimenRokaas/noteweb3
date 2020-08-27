@@ -6,7 +6,7 @@ const router = express.Router();
 const pool = require("../database");
 
 router.get("/list", (req, res) => {
-  pool.query("select * from noter", function(error, noter) {
+  pool.query("select * from noter", (error, noter) => {
     if (error) {
       console.error(error);
     }
@@ -22,7 +22,7 @@ router.put("/:id", (req, res) => {
   pool.query(
     "update noter set ? where arkivNr = ?",
     [record(req), arkivNr],
-    function(error, results) {
+    (error, results) => {
       if (error) {
         console.error(JSON.stringify(error));
         throw error;
@@ -34,13 +34,29 @@ router.put("/:id", (req, res) => {
 
 router.post("/", (req, res) => {
   console.log("Oppretter arkivnr " + req.body.arkivNr);
-  pool.query("insert into noter set ?;", record(req), function(error, results) {
+  pool.query("insert into noter set ?;", record(req), (error, results) => {
     if (error) {
       console.error(JSON.stringify(error));
       throw error;
     }
     res.send(JSON.stringify(results));
   });
+});
+
+router.delete("/:id", (req, res) => {
+  var arkivNr = req.params.id;
+  console.log("Sletter arkivnr " + arkivNr);
+  pool.query(
+    "delete from noter where arkivNr = ?",
+    [arkivNr],
+    (error, results) => {
+      if (error) {
+        console.error(JSON.stringify(error));
+        throw error;
+      }
+      res.send(JSON.stringify(results));
+    }
+  );
 });
 
 function record(req) {

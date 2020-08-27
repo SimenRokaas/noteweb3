@@ -18,4 +18,10 @@ export default class NoteService {
       .post("/noter", note)
       .then(res => res);
   }
+
+  static delete(note) {
+    return Api()
+      .delete("/noter/" + note.arkivNr)
+      .then(res => res);
+  }
 }
