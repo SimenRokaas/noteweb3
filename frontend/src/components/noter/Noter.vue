@@ -195,6 +195,7 @@ export default {
       visSlettKnapp: true,
       visAvbrytKnapp: false,
       mode: "VIS",
+      arkNrNaa: null,
       erDev: process.env.NODE_ENV === "development"
     };
   },
@@ -222,6 +223,7 @@ export default {
       this.$refs.dt.exportCSV();
     },
     onRowSelect(event) {
+      this.arkNrNaa = event.data.arkivNr;
       this.mode = "ENDRE";
       this.dialogNote = { ...event.data };
       this.visSlettKnapp = true;
@@ -230,8 +232,9 @@ export default {
     },
     leggTilNote() {
       this.mode = "NY";
+      this.arkNrNaa = this.genererArkivnr();
       this.dialogNote = {
-        arkivNr: this.genererArkivnr(),
+        arkivNr: this.arkNrNaa,
         tittel1: ""
       };
       this.visSlettKnapp = false;
@@ -239,6 +242,9 @@ export default {
       this.visDialog = true;
     },
     slettNote() {
+      NoteService.delete(this.dialogNote)
+        .then(res => this.handleSuccess(res, "Slettet"))
+        .catch(error => this.handleError(error));
       this.visDialog = false;
       this.dialogNote = null;
       this.valgtNote = null;
@@ -256,18 +262,27 @@ export default {
       this.visDialog = false;
       this.dialogNote = null;
       this.valgtNote = null;
-      this.mode = "VIS";
     },
     handleSuccess(res, text) {
-      var data = JSON.parse(res.config.data);
-      var indexOfUpdatedNote = this.noter.findIndex(
-        n => n.arkivNr === data.arkivNr
+      const indexOfUpdatedNote = this.noter.findIndex(
+        n => n.arkivNr === this.arkNrNaa
       );
-      this.noter.splice(indexOfUpdatedNote, 1, data);
+      if (text === "Opprettet" || text === "Oppdatert") {
+        const data = JSON.parse(res.config.data);
+        if (text === "Oppdatert") {
+          this.noter.splice(indexOfUpdatedNote, 1, data);
+        }
+        if (text === "Opprettet") {
+          this.noter.splice(indexOfUpdatedNote, 0, data);
+        }
+      }
+      if (text === "Slettet") {
+        this.noter.splice(indexOfUpdatedNote, 1);
+      }
       this.$toast.add({
         severity: "success",
         summary: text,
-        detail: "Note " + data.arkivNr + " " + text.toLowerCase() + "!",
+        detail: "Note " + this.arkNrNaa + " " + text.toLowerCase() + "!",
         life: 3000
       });
     },
