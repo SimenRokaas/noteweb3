@@ -59,20 +59,20 @@ router.delete("/:id", (req, res) => {
 
 function record(req) {
   return {
-    arkivNr: blankIfNull(req.body.arkivNr),
-    tittel1: blankIfNull(req.body.tittel1),
-    tittel2: blankIfNull(req.body.tittel2),
-    soloInstrument: blankIfNull(req.body.soloInstrument),
-    durata: blankIfNull(req.body.durata),
-    kategori1: blankIfNull(req.body.kategori1),
-    kategori2: blankIfNull(req.body.kategori2),
-    kategori3: blankIfNull(req.body.kategori3),
-    kommentar: blankIfNull(req.body.kommentar),
-    komponist: blankIfNull(req.body.komponist),
-    land: blankIfNull(req.body.land),
-    arrangor: blankIfNull(req.body.arrangor),
-    arrangertFor1: blankIfNull(req.body.arrangertFor1),
-    arrangertFor2: blankIfNull(req.body.arrangertFor2)
+    arkivNr: blankIfNull(req.body.ArkivNr),
+    tittel1: blankIfNull(req.body.Tittel1),
+    tittel2: blankIfNull(req.body.Tittel2),
+    soloInstrument: blankIfNull(req.body.SoloInstrument),
+    durata: blankIfNull(req.body.Durata),
+    kategori1: blankIfNull(req.body.Kategori1),
+    kategori2: blankIfNull(req.body.Kategori2),
+    kategori3: blankIfNull(req.body.Kategori3),
+    kommentar: blankIfNull(req.body.Kommentar),
+    komponist: blankIfNull(req.body.Komponist),
+    land: blankIfNull(req.body.Land),
+    arrangor: blankIfNull(req.body.Arrangor),
+    arrangertFor1: blankIfNull(req.body.ArrangertFor1),
+    arrangertFor2: blankIfNull(req.body.ArrangertFor2)
   };
 }
 

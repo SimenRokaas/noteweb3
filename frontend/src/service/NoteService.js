@@ -9,7 +9,7 @@ export default class NoteService {
 
   static update(note) {
     return Api()
-      .put("/noter/" + note.arkivNr, note)
+      .put("/noter/" + note.ArkivNr, note)
       .then(res => res);
   }
 
@@ -21,7 +21,7 @@ export default class NoteService {
 
   static delete(note) {
     return Api()
-      .delete("/noter/" + note.arkivNr)
+      .delete("/noter/" + note.ArkivNr)
       .then(res => res);
   }
 }
