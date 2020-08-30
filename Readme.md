@@ -15,7 +15,7 @@ Backend kjøres lokalt med NODE_ENV=production slik at frontend serves fra dist-
 
     cd frontend
     npm run build-dev // bygger frontend/dist med NODE_ENV=development
-    cd ../backend
+    cd ..
     npm run prod-local // kjører med NODE_ENV=production
 
 ### Oppdatere på server
