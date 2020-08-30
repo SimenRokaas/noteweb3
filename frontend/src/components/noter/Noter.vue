@@ -321,7 +321,6 @@ export default {
       this.valgtNote = null;
     },
     handleSuccess(res, text) {
-      console.log("this.arkNrNaa = " + this.arkNrNaa);
       const indexOfUpdatedNote = this.noter.findIndex(
         n => n.ArkivNr === this.arkNrNaa
       );

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 echo "================================================================================================================="
-echo " Bygger frontend for production (NODE_ENV=production) slik at API-kall går til https://tjk.no/notearkiv/noter... "
+echo " Bygger frontend for production (NODE_ENV=production) slik at API-kall går til tjk.no... "
 echo "================================================================================================================="
 
 cd frontend
