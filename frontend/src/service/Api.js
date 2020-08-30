@@ -4,7 +4,7 @@ export default () => {
   const apiUrl =
     process.env.VUE_APP_LOCAL_SERVER === "true"
       ? "http://localhost:57462"
-      : "https://notearkiv.tjk.no";
+      : "https://www.noter.tjk.no";
 
   return axios.create({
     baseURL: apiUrl,
