@@ -277,7 +277,7 @@ export default {
       this.$refs.dt.exportCSV();
     },
     onRowSelect(event) {
-      this.arkNrNaa = event.data.arkivNr;
+      this.arkNrNaa = event.data.ArkivNr;
       this.mode = "ENDRE";
       this.dialogNote = { ...event.data };
       this.visSlettKnapp = true;
@@ -288,7 +288,7 @@ export default {
       this.mode = "NY";
       this.arkNrNaa = this.genererArkivnr();
       this.dialogNote = {
-        arkivNr: this.arkNrNaa
+        ArkivNr: this.arkNrNaa
       };
       this.visSlettKnapp = false;
       this.visAvbrytKnapp = true;
@@ -321,8 +321,9 @@ export default {
       this.valgtNote = null;
     },
     handleSuccess(res, text) {
+      console.log("this.arkNrNaa = " + this.arkNrNaa);
       const indexOfUpdatedNote = this.noter.findIndex(
-        n => n.arkivNr === this.arkNrNaa
+        n => n.ArkivNr === this.arkNrNaa
       );
       if (text === "Opprettet" || text === "Oppdatert") {
         const data = JSON.parse(res.config.data);
@@ -330,7 +331,7 @@ export default {
           this.noter.splice(indexOfUpdatedNote, 1, data);
         }
         if (text === "Opprettet") {
-          this.noter.splice(indexOfUpdatedNote, 0, data);
+          this.noter.unshift(data); // add at beginning of array because of default sorting
         }
       }
       if (text === "Slettet") {
@@ -352,7 +353,7 @@ export default {
       });
     },
     genererArkivnr() {
-      let currentMax = Math.max(...this.noter.map(n => n.arkivNr));
+      let currentMax = Math.max(...this.noter.map(n => n.ArkivNr));
       return currentMax + 1;
     }
   }
