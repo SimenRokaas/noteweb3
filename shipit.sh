@@ -4,22 +4,22 @@ echo " Bygger frontend for production (NODE_ENV=production) slik at API-kall gå
 echo "================================================================================================================="
 
 cd frontend
-#npm run build # bygger med NODE_ENV=production
+npm run build # bygger med NODE_ENV=production
 
 echo "================================================================================================================="
 echo " Lager tgz-filer for overføring... "
 echo "================================================================================================================="
 
-#cd ..
-#tar -zcvf server.tgz *.js *.json routes
-#echo ""
-#tar -zcvf frontend-dist.tgz frontend/dist
+cd ..
+tar -zcvf server.tgz *.js *.json routes
+echo ""
+tar -zcvf frontend-dist.tgz frontend/dist
 
 echo "================================================================================================================="
 echo "Laster opp til server..."
 echo "================================================================================================================="
 
-#scp -P 7822 server.tgz frontend-dist.tgz tjkno@nl1-ss12.a2hosting.com:/home/tjkno/tmp
+scp -P 7822 server.tgz frontend-dist.tgz tjkno@nl1-ss12.a2hosting.com:/home/tjkno/tmp
 
 echo "================================================================================================================="
 echo "Pakker ut på server..."
@@ -36,7 +36,7 @@ echo "==========================================================================
 echo " Rydder opp..."
 echo "================================================================================================================="
 
-#rm server.tgz frontend-dist.tgz
+rm server.tgz frontend-dist.tgz
 
 echo ""
 echo "Ferdig."
