@@ -21,7 +21,7 @@
       selection-mode="single"
       :selection.sync="valgtNote"
       @row-select="onRowSelect"
-      dataKey="arkivNr"
+      dataKey="ArkivNr"
     >
       <template #header>
         <table>
@@ -43,7 +43,10 @@
                 placeholder="Fritekst søk"
                 size="50"
               />
-              <span style="font-size: 24px; color: red; margin-left: 20px" id="betaTekst" class="rainbow"
+              <span
+                style="font-size: 24px; color: red; margin-left: 20px"
+                id="betaTekst"
+                class="rainbow"
                 >BETA</span
               >
             </td>
@@ -94,6 +97,7 @@
       <template #loading>
         Laster noter, vent litt...
       </template>
+
       <Column
         v-for="col of columns"
         :key="col.field"
@@ -193,15 +197,20 @@
 import NoteService from "@/service/NoteService";
 import RolleService from "@/service/RolleService";
 
-const arkivNr = { field: "arkivNr", header: "Arkivnr" };
-const kolTittel1 = { field: "tittel1", header: "Tittel" };
-const kolTittel2 = { field: "tittel2", header: "Tittel 2" };
-const kolSolo = { field: "soloInstrument", header: "Solo-instr" };
-const kolDurata = { field: "durata", header: "Durata" };
-const kolKategori1 = { field: "kategori1", header: "Kategori" };
-const kolKategori2 = { field: "kategori2", header: "Kategori 2" };
-const kolKategori3 = { field: "kategori3", header: "Kategori 3" };
-const kolKommentar = { field: "kommentar", header: "Kommentar" };
+const arkivNr = { field: "ArkivNr", header: "Arkivnr" };
+const kolTittel1 = { field: "Tittel1", header: "Tittel" };
+const kolTittel2 = { field: "Tittel2", header: "Tittel 2" };
+const kolSolo = { field: "SoloInstrument", header: "Solo-instr" };
+const kolDurata = { field: "Durata", header: "Durata" };
+const kolKategori1 = { field: "Kategori1", header: "Kategori" };
+const kolKategori2 = { field: "Kategori2", header: "Kategori 2" };
+const kolKategori3 = { field: "Kategori3", header: "Kategori 3" };
+const kolKommentar = { field: "Kommentar", header: "Kommentar" };
+const kolKomponist = { field: "Komponist", header: "Komponist" };
+const kolLand = { field: "Land", header: "Land" };
+const kolArrangor = { field: "Arrangor", header: "Arrangør" };
+const kolArrangertFor1 = { field: "ArrangertFor1", header: "Arrangert for" };
+const kolArrangertFor2 = { field: "ArrangertFor2", header: "Arrangert for 2" };
 
 const allCols = [
   arkivNr,
@@ -212,9 +221,14 @@ const allCols = [
   kolKategori1,
   kolKategori2,
   kolKategori3,
-  kolKommentar
+  kolKommentar,
+  kolKomponist,
+  kolLand,
+  kolArrangor,
+  kolArrangertFor1,
+  kolArrangertFor2
 ];
-const minCols = [arkivNr, kolTittel1, kolKategori1, kolKommentar];
+const minCols = [arkivNr, kolTittel1, kolKategori1, kolKomponist, kolKommentar];
 
 export default {
   name: "Noter",
@@ -274,8 +288,7 @@ export default {
       this.mode = "NY";
       this.arkNrNaa = this.genererArkivnr();
       this.dialogNote = {
-        arkivNr: this.arkNrNaa,
-        tittel1: ""
+        arkivNr: this.arkNrNaa
       };
       this.visSlettKnapp = false;
       this.visAvbrytKnapp = true;
@@ -365,7 +378,7 @@ export default {
 .rainbow {
   /* Font options */
   text-shadow: 2px 2px 4px #000000;
-  font-size:40px;
+  font-size: 40px;
 
   /* Chrome, Safari, Opera */
   -webkit-animation: rainbow 5s infinite;
@@ -378,7 +391,7 @@ export default {
 }
 
 /* Chrome, Safari, Opera */
-@-webkit-keyframes rainbow{
+@-webkit-keyframes rainbow {
   0%{color: orange;}
   10%{color: purple;}
   20%{color: red;}
@@ -393,7 +406,7 @@ export default {
 }
 
 /* Internet Explorer */
-@-ms-keyframes rainbow{
+@-ms-keyframes rainbow {
   0%{color: orange;}
   10%{color: purple;}
   20%{color: red;}
@@ -407,8 +420,8 @@ export default {
   100%{color: orange;}
 }
 
-/* Standar Syntax */
-@keyframes rainbow{
+/* Standard Syntax */
+@keyframes rainbow {
   0%{color: orange;}
   10%{color: purple;}
   20%{color: red;}
@@ -421,5 +434,4 @@ export default {
   90%{color: DodgerBlue;}
   100%{color: orange;}
 }
-
 </style>
