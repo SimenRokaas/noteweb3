@@ -1,27 +1,63 @@
 <template>
   <div>
+    <Dialog
+      :visible="!kanLese && !kanSkrive"
+      :style="{ width: '600px' }"
+      header="Logg inn"
+      :modal="true"
+    >
+      <div class="p-grid p-fluid" style="margin-bottom: 5px">
+        Du må logge på notearkivet separat. Oppgi passord nedenfor.
+      </div>
+
+      <div class="p-grid p-fluid">
+        <div style="margin-bottom: 5px">
+          <Password v-model="passord" :feedback="false" />
+        </div>
+      </div>
+
+      <template #footer>
+        <div
+          v-if="passordFeil"
+          class="p-grid p-fluid"
+          style="margin-bottom: 5px; color: red"
+        >
+          Feil/ukjent passord. Prøv igjen!
+        </div>
+        <div>
+          <Button
+            label="OK"
+            icon="pi pi-check"
+            @click="settRolle"
+            class="p-button-success"
+          />
+        </div>
+      </template>
+    </Dialog>
+
     <DataTable
-      ref="dt"
-      class="p-datatable-noter"
-      :value="noter"
       :filters="filters"
       :loading="loading"
-      auto-layout
-      sort-field="arkivNr"
-      :sort-order="-1"
+      :paginator="true"
+      :resizable-columns="true"
+      :row-hover="true"
       :rows="15"
       :rows-per-page-options="[15, 30, 60, 100]"
-      :row-hover="true"
-      :paginator="true"
-      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
-      :resizable-columns="true"
-      export-filename="noter"
-      csv-separator="|"
-      selection-mode="single"
       :selection.sync="valgtNote"
+      :sort-order="-1"
+      :value="noter"
       @row-select="onRowSelect"
+      auto-layout
+      class="p-datatable-noter"
+      csv-separator="|"
+      current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
       dataKey="ArkivNr"
+      export-filename="noter"
+      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+      ref="dt"
+      selection-mode="single"
+      sort-field="arkivNr"
+      v-if="kanLese || kanSkrive"
     >
       <template #header>
         <table>
@@ -51,6 +87,16 @@
               >
             </td>
             <td style="float: right">
+              <span v-if="erDev">
+                <Checkbox id="toggleKanLese" v-model="kanLese" :binary="true" />
+                <label
+                  for="toggleKanLese"
+                  class="p-checkbox-label"
+                  style="font-size: 9px; margin-right: 4px"
+                >
+                  Kan lese (DEV)
+                </label>
+              </span>
               <span v-if="erDev">
                 <Checkbox
                   id="toggleKanSkrive"
@@ -195,7 +241,6 @@
 
 <script>
 import NoteService from "@/service/NoteService";
-import RolleService from "@/service/RolleService";
 
 const arkivNr = { field: "ArkivNr", header: "Arkivnr" };
 const kolTittel1 = { field: "Tittel1", header: "Tittel" };
@@ -234,6 +279,8 @@ export default {
   name: "Noter",
   data() {
     return {
+      passord: null,
+      passordFeil: false,
       title: process.env.VUE_APP_TITLE,
       columnOptions: null,
       allColumns: allCols,
@@ -241,6 +288,7 @@ export default {
       filters: {},
       loading: true,
       noter: [],
+      kanLese: false,
       kanSkrive: false,
       valgtNote: null,
       dialogNote: {},
@@ -267,12 +315,18 @@ export default {
       this.noter = data;
       this.loading = false;
     });
-    // hvis vi kan nå en styre-side på tjk.no så har vi skrive-rettighet
-    RolleService.fetchRolle().then(data => {
-      this.kanSkrive = data;
-    });
   },
   methods: {
+    settRolle() {
+      if (this.passord === "tonekunst") {
+        this.kanLese = true;
+      } else if (this.passord === "ravikra") {
+        this.kanLese = true;
+        this.kanSkrive = true;
+      } else {
+        this.passordFeil = true;
+      }
+    },
     exportCSV() {
       this.$refs.dt.exportCSV();
     },
@@ -392,46 +446,112 @@ export default {
 
 /* Chrome, Safari, Opera */
 @-webkit-keyframes rainbow {
-  0%{color: orange;}
-  10%{color: purple;}
-  20%{color: red;}
-  30%{color: CadetBlue;}
-  40%{color: yellow;}
-  50%{color: coral;}
-  60%{color: green;}
-  70%{color: cyan;}
-  80%{color: DeepPink;}
-  90%{color: DodgerBlue;}
-  100%{color: orange;}
+  0% {
+    color: orange;
+  }
+  10% {
+    color: purple;
+  }
+  20% {
+    color: red;
+  }
+  30% {
+    color: CadetBlue;
+  }
+  40% {
+    color: yellow;
+  }
+  50% {
+    color: coral;
+  }
+  60% {
+    color: green;
+  }
+  70% {
+    color: cyan;
+  }
+  80% {
+    color: DeepPink;
+  }
+  90% {
+    color: DodgerBlue;
+  }
+  100% {
+    color: orange;
+  }
 }
 
 /* Internet Explorer */
 @-ms-keyframes rainbow {
-  0%{color: orange;}
-  10%{color: purple;}
-  20%{color: red;}
-  30%{color: CadetBlue;}
-  40%{color: yellow;}
-  50%{color: coral;}
-  60%{color: green;}
-  70%{color: cyan;}
-  80%{color: DeepPink;}
-  90%{color: DodgerBlue;}
-  100%{color: orange;}
+  0% {
+    color: orange;
+  }
+  10% {
+    color: purple;
+  }
+  20% {
+    color: red;
+  }
+  30% {
+    color: CadetBlue;
+  }
+  40% {
+    color: yellow;
+  }
+  50% {
+    color: coral;
+  }
+  60% {
+    color: green;
+  }
+  70% {
+    color: cyan;
+  }
+  80% {
+    color: DeepPink;
+  }
+  90% {
+    color: DodgerBlue;
+  }
+  100% {
+    color: orange;
+  }
 }
 
 /* Standard Syntax */
 @keyframes rainbow {
-  0%{color: orange;}
-  10%{color: purple;}
-  20%{color: red;}
-  30%{color: CadetBlue;}
-  40%{color: yellow;}
-  50%{color: coral;}
-  60%{color: green;}
-  70%{color: cyan;}
-  80%{color: DeepPink;}
-  90%{color: DodgerBlue;}
-  100%{color: orange;}
+  0% {
+    color: orange;
+  }
+  10% {
+    color: purple;
+  }
+  20% {
+    color: red;
+  }
+  30% {
+    color: CadetBlue;
+  }
+  40% {
+    color: yellow;
+  }
+  50% {
+    color: coral;
+  }
+  60% {
+    color: green;
+  }
+  70% {
+    color: cyan;
+  }
+  80% {
+    color: DeepPink;
+  }
+  90% {
+    color: DodgerBlue;
+  }
+  100% {
+    color: orange;
+  }
 }
 </style>

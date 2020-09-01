@@ -11,6 +11,7 @@ import InputText from "primevue/inputtext";
 import Message from "primevue/message";
 import Toast from "primevue/toast";
 import ToastService from "primevue/toastservice";
+import Password from "primevue/password";
 
 Vue.use(ToastService);
 
@@ -22,6 +23,7 @@ Vue.component("Dialog", Dialog);
 Vue.component("InputText", InputText);
 Vue.component("Message", Message);
 Vue.component("Toast", Toast);
+Vue.component("Password", Password);
 
 import "primevue/resources/themes/nova-light/theme.css";
 import "primevue/resources/primevue.min.css";

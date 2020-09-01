@@ -28,7 +28,6 @@ if (process.env.NODE_ENV === "development") {
 
 // routes for the app
 app.use("/noter", require("./routes/noter"));
-app.use("/rolle", require("./routes/rolle"));
 
 console.log("Env: " + process.env.NODE_ENV);
 if (process.env.NODE_ENV !== "development") {
