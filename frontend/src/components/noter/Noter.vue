@@ -40,6 +40,7 @@
       :loading="loading"
       :paginator="true"
       :resizable-columns="true"
+      :reorderableColumns="true"
       :row-hover="true"
       :rows="15"
       :rows-per-page-options="[15, 30, 60, 100]"
@@ -71,6 +72,9 @@
             </td>
             <td style="float: left; margin-right: 8px">
               {{ title }}
+              <span style="horiz-align: left; font-size: 12px">
+                v2020.09.02
+              </span>
             </td>
             <td style="float: left">
               <i class="pi pi-search"></i>
@@ -79,12 +83,6 @@
                 placeholder="Fritekst søk"
                 size="50"
               />
-              <span
-                style="font-size: 24px; color: red; margin-left: 20px"
-                id="betaTekst"
-                class="rainbow"
-                >BETA</span
-              >
             </td>
             <td style="float: right">
               <span v-if="erDev">
@@ -273,7 +271,14 @@ const allCols = [
   kolArrangertFor1,
   kolArrangertFor2
 ];
-const minCols = [arkivNr, kolTittel1, kolKategori1, kolKomponist, kolKommentar];
+const minCols = [
+  arkivNr,
+  kolTittel1,
+  kolKategori1,
+  kolKomponist,
+  kolArrangor,
+  kolKommentar
+];
 
 export default {
   name: "Noter",
@@ -429,129 +434,12 @@ export default {
   font-size: 20px;
 }
 
-.rainbow {
-  /* Font options */
-  text-shadow: 2px 2px 4px #000000;
-  font-size: 40px;
-
-  /* Chrome, Safari, Opera */
-  -webkit-animation: rainbow 5s infinite;
-
-  /* Internet Explorer */
-  -ms-animation: rainbow 5s infinite;
-
-  /* Standard Syntax */
-  animation: rainbow 5s infinite;
+*:not(.fa) {
+  font-family: Arial, "Avenir", Helvetica, sans-serif;
 }
 
-/* Chrome, Safari, Opera */
-@-webkit-keyframes rainbow {
-  0% {
-    color: orange;
-  }
-  10% {
-    color: purple;
-  }
-  20% {
-    color: red;
-  }
-  30% {
-    color: CadetBlue;
-  }
-  40% {
-    color: yellow;
-  }
-  50% {
-    color: coral;
-  }
-  60% {
-    color: green;
-  }
-  70% {
-    color: cyan;
-  }
-  80% {
-    color: DeepPink;
-  }
-  90% {
-    color: DodgerBlue;
-  }
-  100% {
-    color: orange;
-  }
-}
-
-/* Internet Explorer */
-@-ms-keyframes rainbow {
-  0% {
-    color: orange;
-  }
-  10% {
-    color: purple;
-  }
-  20% {
-    color: red;
-  }
-  30% {
-    color: CadetBlue;
-  }
-  40% {
-    color: yellow;
-  }
-  50% {
-    color: coral;
-  }
-  60% {
-    color: green;
-  }
-  70% {
-    color: cyan;
-  }
-  80% {
-    color: DeepPink;
-  }
-  90% {
-    color: DodgerBlue;
-  }
-  100% {
-    color: orange;
-  }
-}
-
-/* Standard Syntax */
-@keyframes rainbow {
-  0% {
-    color: orange;
-  }
-  10% {
-    color: purple;
-  }
-  20% {
-    color: red;
-  }
-  30% {
-    color: CadetBlue;
-  }
-  40% {
-    color: yellow;
-  }
-  50% {
-    color: coral;
-  }
-  60% {
-    color: green;
-  }
-  70% {
-    color: cyan;
-  }
-  80% {
-    color: DeepPink;
-  }
-  90% {
-    color: DodgerBlue;
-  }
-  100% {
-    color: orange;
-  }
+label,
+td {
+  color: black;
 }
 </style>
