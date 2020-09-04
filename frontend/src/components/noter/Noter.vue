@@ -12,7 +12,7 @@
 
       <div class="p-grid p-fluid">
         <div style="margin-bottom: 5px">
-          <Password v-model="passord" :feedback="false" />
+          <Password v-model="passord" :feedback="false" @keyup.enter.native="settRolle" />
         </div>
       </div>
 
@@ -73,7 +73,7 @@
             <td style="float: left; margin-right: 8px">
               {{ title }}
               <span style="horiz-align: left; font-size: 12px">
-                v2020.09.02
+                v2020.09.04
               </span>
             </td>
             <td style="float: left">
@@ -435,11 +435,6 @@ export default {
 }
 
 *:not(.fa) {
-  font-family: Arial, "Avenir", Helvetica, sans-serif;
-}
-
-label,
-td {
-  color: black;
+  font-family: Tahoma, Verdana, Arial, "Avenir", Helvetica, sans-serif;
 }
 </style>
