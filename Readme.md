@@ -28,3 +28,9 @@ Backend kjøres (på server) med NODE_ENV=production slik at frontend serves fra
 
 1. Last opp backend-katalogen + frontend/dist til server
 1. Sjekk oppsett på server - se node.js setup på webhotell (A2 hosting)
+
+## Oppdatere npm-avhengigheter
+    npx npm-check-updates -u
+    npm install
+    
+Se https://www.carlrippon.com/upgrading-npm-dependencies/
