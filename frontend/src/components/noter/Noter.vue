@@ -434,8 +434,4 @@ export default {
   text-align: left;
   font-size: 20px;
 }
-
-*:not(.fa) {
-  font-family: Verdana, Arial, "Avenir", Helvetica, sans-serif;
-}
 </style>
