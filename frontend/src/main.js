@@ -25,13 +25,13 @@ Vue.component("Message", Message);
 Vue.component("Toast", Toast);
 Vue.component("Password", Password);
 
-import "primevue/resources/themes/nova-light/theme.css";
+import "primevue/resources/themes/nova/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
 Vue.config.productionTip = false;
 
 new Vue({
-  render: h => h(App),
-  router
+  render: (h) => h(App),
+  router: router,
 }).$mount("#app");

@@ -12,7 +12,11 @@
 
       <div class="p-grid p-fluid">
         <div style="margin-bottom: 5px">
-          <Password v-model="passord" :feedback="false" @keyup.enter.native="settRolle" />
+          <Password
+            v-model="passord"
+            :feedback="false"
+            @keyup.enter.native="settRolle"
+          />
         </div>
       </div>
 
@@ -49,7 +53,7 @@
       :value="noter"
       @row-select="onRowSelect"
       auto-layout
-      class="p-datatable-noter"
+      class="p-datatable-striped"
       csv-separator="|"
       current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
       dataKey="ArkivNr"
@@ -64,6 +68,7 @@
         <table>
           <tr>
             <td style="float: left; margin-right: 8px">
+              <!--suppress HtmlUnknownTarget -->
               <img
                 src="Tønsberg-Janitsjarkorps-logo-600px-300x300.jpg"
                 alt="TJK logo"
@@ -135,12 +140,8 @@
           </tr>
         </table>
       </template>
-      <template #empty>
-        Ingen treff.
-      </template>
-      <template #loading>
-        Laster noter, vent litt...
-      </template>
+      <template #empty> Ingen treff. </template>
+      <template #loading> Laster noter, vent litt... </template>
 
       <Column
         v-for="col of columns"
@@ -269,7 +270,7 @@ const allCols = [
   kolLand,
   kolArrangor,
   kolArrangertFor1,
-  kolArrangertFor2
+  kolArrangertFor2,
 ];
 const minCols = [
   arkivNr,
@@ -277,7 +278,7 @@ const minCols = [
   kolKategori1,
   kolKomponist,
   kolArrangor,
-  kolKommentar
+  kolKommentar,
 ];
 
 export default {
@@ -303,20 +304,20 @@ export default {
       visBekreftSlett: false,
       mode: "VIS",
       arkNrNaa: null,
-      erDev: process.env.NODE_ENV === "development"
+      erDev: process.env.NODE_ENV === "development",
     };
   },
   computed: {
     columns() {
       return this.showAllCols ? allCols : minCols;
-    }
+    },
   },
   created() {
     this.columnOptions = this.showAllCols ? allCols : minCols;
   },
   mounted() {
     this.title = process.env.VUE_APP_TITLE;
-    NoteService.fetchNoter().then(data => {
+    NoteService.fetchNoter().then((data) => {
       this.noter = data;
       this.loading = false;
     });
@@ -347,7 +348,7 @@ export default {
       this.mode = "NY";
       this.arkNrNaa = this.genererArkivnr();
       this.dialogNote = {
-        ArkivNr: this.arkNrNaa
+        ArkivNr: this.arkNrNaa,
       };
       this.visSlettKnapp = false;
       this.visAvbrytKnapp = true;
@@ -359,8 +360,8 @@ export default {
     slettNote() {
       this.visBekreftSlett = false;
       NoteService.delete(this.dialogNote)
-        .then(res => this.handleSuccess(res, "Slettet"))
-        .catch(error => this.handleError(error));
+        .then((res) => this.handleSuccess(res, "Slettet"))
+        .catch((error) => this.handleError(error));
       this.visDialog = false;
       this.dialogNote = null;
       this.valgtNote = null;
@@ -368,12 +369,12 @@ export default {
     lagreNote() {
       if (this.mode === "NY") {
         NoteService.create(this.dialogNote)
-          .then(res => this.handleSuccess(res, "Opprettet"))
-          .catch(error => this.handleError(error));
+          .then((res) => this.handleSuccess(res, "Opprettet"))
+          .catch((error) => this.handleError(error));
       } else {
         NoteService.update(this.dialogNote)
-          .then(res => this.handleSuccess(res, "Oppdatert"))
-          .catch(error => this.handleError(error));
+          .then((res) => this.handleSuccess(res, "Oppdatert"))
+          .catch((error) => this.handleError(error));
       }
       this.visDialog = false;
       this.dialogNote = null;
@@ -381,7 +382,7 @@ export default {
     },
     handleSuccess(res, text) {
       const indexOfUpdatedNote = this.noter.findIndex(
-        n => n.ArkivNr === this.arkNrNaa
+        (n) => n.ArkivNr === this.arkNrNaa
       );
       if (text === "Opprettet" || text === "Oppdatert") {
         const data = JSON.parse(res.config.data);
@@ -399,7 +400,7 @@ export default {
         severity: "success",
         summary: text,
         detail: "Note " + this.arkNrNaa + " " + text.toLowerCase() + "!",
-        life: 3000
+        life: 3000,
       });
     },
     handleError(error) {
@@ -407,14 +408,14 @@ export default {
         severity: "error",
         summary: "Feil",
         detail: error,
-        life: 3000
+        life: 3000,
       });
     },
     genererArkivnr() {
-      let currentMax = Math.max(...this.noter.map(n => n.ArkivNr));
+      let currentMax = Math.max(...this.noter.map((n) => n.ArkivNr));
       return currentMax + 1;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -435,6 +436,6 @@ export default {
 }
 
 *:not(.fa) {
-  font-family: Tahoma, Verdana, Arial, "Avenir", Helvetica, sans-serif;
+  font-family: Verdana, Arial, "Avenir", Helvetica, sans-serif;
 }
 </style>
