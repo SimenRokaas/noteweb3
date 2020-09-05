@@ -78,16 +78,18 @@
             <td style="float: left; margin-right: 8px">
               {{ title }}
               <span style="horiz-align: left; font-size: 12px">
-                v2020.09.04
+                v2020.09.05
               </span>
             </td>
             <td style="float: left">
-              <i class="pi pi-search"></i>
-              <InputText
-                v-model="filters['global']"
-                placeholder="Fritekst søk"
-                size="50"
-              />
+              <span class="p-input-icon-left">
+                <i class="pi pi-search" />
+                <InputText
+                  v-model="filters['global']"
+                  placeholder="Fritekst søk"
+                  size="50"
+                />
+              </span>
             </td>
             <td style="float: right">
               <span v-if="erDev">
@@ -163,10 +165,18 @@
           <div style="margin-bottom: 5px">
             <label :for="col.field">{{ col.header }}</label>
             <InputText
+              v-if="col.field === 'ArkivNr'"
               :id="col.field"
               v-model="dialogNote[col.field]"
               :disabled="!kanSkrive || col.field === 'arkivNr'"
               autocomplete="off"
+            />
+            <AutoComplete
+              v-else
+              :id="col.field"
+              v-model="dialogNote[col.field]"
+              :suggestions="autocompleteSuggestions"
+              @complete="autocompleteSearch($event, col.field)"
             />
           </div>
         </div>
@@ -244,7 +254,7 @@ import NoteService from "@/service/NoteService";
 const arkivNr = { field: "ArkivNr", header: "Arkivnr" };
 const kolTittel1 = { field: "Tittel1", header: "Tittel" };
 const kolTittel2 = { field: "Tittel2", header: "Tittel 2" };
-const kolSolo = { field: "SoloInstrument", header: "Solo-instr" };
+const kolSolo = { field: "Soloinstrument", header: "Solo-instr" };
 const kolDurata = { field: "Durata", header: "Durata" };
 const kolKategori1 = { field: "Kategori1", header: "Kategori" };
 const kolKategori2 = { field: "Kategori2", header: "Kategori 2" };
@@ -305,6 +315,7 @@ export default {
       mode: "VIS",
       arkNrNaa: null,
       erDev: process.env.NODE_ENV === "development",
+      autocompleteSuggestions: null,
     };
   },
   computed: {
@@ -414,6 +425,16 @@ export default {
     genererArkivnr() {
       let currentMax = Math.max(...this.noter.map((n) => n.ArkivNr));
       return currentMax + 1;
+    },
+    autocompleteSearch(event, field) {
+      const fieldArr = this.noter.map((n) => n[field]).filter((f) => f != null);
+      const startsWith = fieldArr.filter((f) =>
+        f.toLowerCase().startsWith(event.query.toLowerCase())
+      );
+      const includes = fieldArr.filter((f) =>
+        f.toLowerCase().includes(event.query.toLowerCase())
+      );
+      this.autocompleteSuggestions = [...new Set(startsWith.concat(includes))];
     },
   },
 };
