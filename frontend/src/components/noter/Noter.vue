@@ -14,6 +14,7 @@
         <div style="margin-bottom: 5px">
           <Password
             v-model="passord"
+            autofocus
             :feedback="false"
             @keyup.enter.native="settRolle"
           />
@@ -78,7 +79,7 @@
             <td style="float: left; margin-right: 8px">
               {{ title }}
               <span style="horiz-align: left; font-size: 12px">
-                v2020.09.05
+                v2020.09.06
               </span>
             </td>
             <td style="float: left">
@@ -88,6 +89,7 @@
                   v-model="filters['global']"
                   placeholder="Fritekst søk"
                   size="50"
+                  @keyup="highlightMatches($event)"
                 />
               </span>
             </td>
@@ -136,8 +138,18 @@
                 icon="pi pi-external-link"
                 label="Eksport"
                 @click="exportCSV($event)"
+                style="margin-right: 4px"
                 class="p-button-success"
               />
+              <Button
+                icon="pi pi-sign-out"
+                label="Logg ut"
+                @click="
+                  if (kanSkrive) kanSkrive = false;
+                  if (kanLese) kanLese = false;
+                "
+                class="p-button-warning"
+              ></Button>
             </td>
           </tr>
         </table>
@@ -435,6 +447,24 @@ export default {
         f.toLowerCase().includes(event.query.toLowerCase())
       );
       this.autocompleteSuggestions = [...new Set(startsWith.concat(includes))];
+    },
+    highlightMatches() {
+      const searchWords = this.filters["global"].split(" ");
+      console.log("searchWords=" + searchWords);
+      const tabellen = document.querySelector(".p-datatable-tbody");
+      const tds = tabellen.getElementsByTagName("TD");
+      tds.forEach((td) => {
+        td.innerHTML = td.innerHTML.replace("<mark>", "");
+        td.innerHTML = td.innerHTML.replace("</mark>", "");
+        searchWords.forEach((word) => {
+          if (td.textContent.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
+            td.innerHTML = td.innerHTML.replace(
+              word,
+              "<mark>" + word + "</mark>"
+            );
+          }
+        });
+      });
     },
   },
 };
