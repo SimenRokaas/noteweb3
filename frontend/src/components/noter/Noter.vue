@@ -79,12 +79,12 @@
             <td style="float: left; margin-right: 8px">
               {{ title }}
               <span style="horiz-align: left; font-size: 12px">
-                v2020.09.06
+                v2020.09.09
               </span>
             </td>
             <td style="float: left">
               <span class="p-input-icon-left">
-                <i class="pi pi-search" />
+                <i class="pi pi-search"></i>
                 <InputText
                   v-model="filters['global']"
                   placeholder="Fritekst søk"
@@ -450,17 +450,19 @@ export default {
     },
     highlightMatches() {
       const searchWords = this.filters["global"].split(" ");
-      console.log("searchWords=" + searchWords);
       const tabellen = document.querySelector(".p-datatable-tbody");
       const tds = tabellen.getElementsByTagName("TD");
       tds.forEach((td) => {
-        td.innerHTML = td.innerHTML.replace("<mark>", "");
-        td.innerHTML = td.innerHTML.replace("</mark>", "");
+        td.innerHTML = td.innerHTML.replace(/<mark>(.*)<\/mark>/, "$1");
         searchWords.forEach((word) => {
-          if (td.textContent.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
+          if (
+            word.length > 0 &&
+            td.textContent.toLowerCase().indexOf(word.toLowerCase()) !== -1
+          ) {
+            const wordEscaped = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
             td.innerHTML = td.innerHTML.replace(
-              word,
-              "<mark>" + word + "</mark>"
+              new RegExp(wordEscaped, "i"),
+              "<mark>$&</mark>"
             );
           }
         });
