@@ -61,6 +61,7 @@
       export-filename="noter"
       paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       ref="dt"
+      id="notetabell"
       selection-mode="single"
       sort-field="arkivNr"
       v-if="kanLese || kanSkrive"
@@ -135,9 +136,26 @@
                 class="p-button-success"
               />
               <Button
-                icon="pi pi-external-link"
-                label="Eksport"
-                @click="exportCSV($event)"
+                icon="pi pi-file"
+                label="CSV"
+                title="Eksporter tabell som csv-fil, felt adskilt med '|'"
+                @click="exportCSV()"
+                style="margin-right: 4px"
+                class="p-button-success"
+              />
+              <Button
+                icon="pi pi-file-excel"
+                label="Skjerm"
+                title="Eksporter tabell slik den vises på skjermen"
+                @click="exportShownToExcel()"
+                style="margin-right: 4px"
+                class="p-button-success"
+              />
+              <Button
+                icon="pi pi-file-excel"
+                label="Alle"
+                title="Eksporter alle noter, faste kolonner"
+                @click="exportAllToExcel()"
                 style="margin-right: 4px"
                 class="p-button-success"
               />
@@ -180,7 +198,7 @@
               v-if="col.field === 'ArkivNr'"
               :id="col.field"
               v-model="dialogNote[col.field]"
-              :disabled="!kanSkrive || col.field === 'arkivNr'"
+              :disabled="!kanSkrive"
               autocomplete="off"
             />
             <AutoComplete
@@ -188,6 +206,7 @@
               :id="col.field"
               v-model="dialogNote[col.field]"
               :suggestions="autocompleteSuggestions"
+              :disabled="!kanSkrive"
               @complete="autocompleteSearch($event, col.field)"
             />
           </div>
@@ -262,6 +281,7 @@
 
 <script>
 import NoteService from "@/service/NoteService";
+import XLSX from "xlsx";
 
 const arkivNr = { field: "ArkivNr", header: "Arkivnr" };
 const kolTittel1 = { field: "Tittel1", header: "Tittel" };
@@ -304,6 +324,9 @@ const minCols = [
 ];
 
 export default {
+  // components: {
+  //   XLSX,
+  // },
   name: "Noter",
   data() {
     return {
@@ -356,8 +379,38 @@ export default {
         this.passordFeil = true;
       }
     },
+    // TODO SplitButton for eksport
     exportCSV() {
       this.$refs.dt.exportCSV();
+    },
+    exportShownToExcel() {
+      const elt = document.getElementById("notetabell");
+      const wb = XLSX.utils.table_to_book(elt, {
+        sheet: "TJK-notearkiv-utsnitt",
+      });
+      return XLSX.writeFile(wb, "TJK-notearkiv-utsnitt.xlsx");
+    },
+    exportAllToExcel() {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(this.noter);
+      ws["!cols"] = [
+        { wch: 6 }, // arkivNr
+        { wch: 20 }, // tittel1
+        { wch: 15 }, // tittel2
+        { wch: 10 }, // soloinstr
+        { wch: 8 }, // durata
+        { wch: 20 }, // kat1
+        { wch: 20 }, // kat2
+        { wch: 10 }, // kat3
+        { wch: 30 }, // kommentar
+        { wch: 20 }, // komponist
+        { wch: 8 }, // land
+        { wch: 20 }, // arrangor
+        { wch: 10 }, // arrangortFor1
+        { wch: 10 }, // arrangortFor2
+      ];
+      XLSX.utils.book_append_sheet(wb, ws, "TJK-notearkiv-alle");
+      return XLSX.writeFile(wb, "TJK-notearkiv-alle.xlsx");
     },
     onRowSelect(event) {
       this.arkNrNaa = event.data.ArkivNr;
