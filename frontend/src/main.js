@@ -11,6 +11,7 @@ import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import Message from "primevue/message";
 import Password from "primevue/password";
+import SplitButton from "primevue/splitbutton";
 import Toast from "primevue/toast";
 import ToastService from "primevue/toastservice";
 
@@ -25,6 +26,7 @@ Vue.component("Dialog", Dialog);
 Vue.component("InputText", InputText);
 Vue.component("Message", Message);
 Vue.component("Password", Password);
+Vue.component("SplitButton", SplitButton);
 Vue.component("Toast", Toast);
 
 import "primevue/resources/themes/nova/theme.css";
