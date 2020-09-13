@@ -80,7 +80,7 @@
             <td style="float: left; margin-right: 8px">
               {{ title }}
               <span style="horiz-align: left; font-size: 12px">
-                v2020.09.09
+                v2020.09.13
               </span>
             </td>
             <td style="float: left">
