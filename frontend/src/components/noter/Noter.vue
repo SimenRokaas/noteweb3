@@ -135,30 +135,13 @@
                 v-show="kanSkrive"
                 class="p-button-success"
               />
-              <Button
-                icon="pi pi-file"
-                label="CSV"
-                title="Eksporter tabell som csv-fil, felt adskilt med '|'"
-                @click="exportCSV()"
+              <SplitButton
+                label="Eksport"
+                icon="pi pi-external-link"
+                :model="eksportValg"
                 style="margin-right: 4px"
-                class="p-button-success"
-              />
-              <Button
-                icon="pi pi-file-excel"
-                label="Skjerm"
-                title="Eksporter tabell slik den vises på skjermen"
-                @click="exportShownToExcel()"
-                style="margin-right: 4px"
-                class="p-button-success"
-              />
-              <Button
-                icon="pi pi-file-excel"
-                label="Alle"
-                title="Eksporter alle noter, faste kolonner"
-                @click="exportAllToExcel()"
-                style="margin-right: 4px"
-                class="p-button-success"
-              />
+              >
+              </SplitButton>
               <Button
                 icon="pi pi-sign-out"
                 label="Logg ut"
@@ -324,9 +307,6 @@ const minCols = [
 ];
 
 export default {
-  // components: {
-  //   XLSX,
-  // },
   name: "Noter",
   data() {
     return {
@@ -351,6 +331,55 @@ export default {
       arkNrNaa: null,
       erDev: process.env.NODE_ENV === "development",
       autocompleteSuggestions: null,
+      eksportValg: [
+        {
+          label: "Alle > Excel",
+          title: "Eksporter alle noter til Excel-fil (faste kolonner)",
+          icon: "pi pi-file-excel",
+          command: () => {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(this.noter);
+            ws["!cols"] = [
+              { wch: 6 }, // arkivNr
+              { wch: 20 }, // tittel1
+              { wch: 15 }, // tittel2
+              { wch: 10 }, // soloinstr
+              { wch: 8 }, // durata
+              { wch: 20 }, // kat1
+              { wch: 20 }, // kat2
+              { wch: 10 }, // kat3
+              { wch: 30 }, // kommentar
+              { wch: 20 }, // komponist
+              { wch: 8 }, // land
+              { wch: 20 }, // arrangor
+              { wch: 10 }, // arrangortFor1
+              { wch: 10 }, // arrangortFor2
+            ];
+            XLSX.utils.book_append_sheet(wb, ws, "TJK-notearkiv-alle");
+            XLSX.writeFile(wb, "TJK-notearkiv-alle.xlsx");
+          },
+        },
+        {
+          label: "Skjerm > Excel",
+          title: "Eksporter vist tabell til Excel-fil",
+          icon: "pi pi-file-excel",
+          command: () => {
+            const elt = document.getElementById("notetabell");
+            const wb = XLSX.utils.table_to_book(elt, {
+              sheet: "TJK-notearkiv-utsnitt",
+            });
+            XLSX.writeFile(wb, "TJK-notearkiv-utsnitt.xlsx");
+          },
+        },
+        {
+          label: "Skjerm > CSV",
+          title: "Eksporter vist tabell til csv-fil, feltskille '|'",
+          icon: "pi pi-file",
+          command: () => {
+            this.$refs.dt.exportCSV();
+          },
+        },
+      ],
     };
   },
   computed: {
@@ -378,39 +407,6 @@ export default {
       } else {
         this.passordFeil = true;
       }
-    },
-    // TODO SplitButton for eksport
-    exportCSV() {
-      this.$refs.dt.exportCSV();
-    },
-    exportShownToExcel() {
-      const elt = document.getElementById("notetabell");
-      const wb = XLSX.utils.table_to_book(elt, {
-        sheet: "TJK-notearkiv-utsnitt",
-      });
-      return XLSX.writeFile(wb, "TJK-notearkiv-utsnitt.xlsx");
-    },
-    exportAllToExcel() {
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(this.noter);
-      ws["!cols"] = [
-        { wch: 6 }, // arkivNr
-        { wch: 20 }, // tittel1
-        { wch: 15 }, // tittel2
-        { wch: 10 }, // soloinstr
-        { wch: 8 }, // durata
-        { wch: 20 }, // kat1
-        { wch: 20 }, // kat2
-        { wch: 10 }, // kat3
-        { wch: 30 }, // kommentar
-        { wch: 20 }, // komponist
-        { wch: 8 }, // land
-        { wch: 20 }, // arrangor
-        { wch: 10 }, // arrangortFor1
-        { wch: 10 }, // arrangortFor2
-      ];
-      XLSX.utils.book_append_sheet(wb, ws, "TJK-notearkiv-alle");
-      return XLSX.writeFile(wb, "TJK-notearkiv-alle.xlsx");
     },
     onRowSelect(event) {
       this.arkNrNaa = event.data.ArkivNr;
