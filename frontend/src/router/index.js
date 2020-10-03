@@ -11,7 +11,7 @@ export default new Router({
     {
       path: "/",
       name: "noter",
-      component: Noter
-    }
-  ]
+      component: Noter,
+    },
+  ],
 });
