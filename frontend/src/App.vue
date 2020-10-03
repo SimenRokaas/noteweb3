@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: "TjkNoter"
+  name: "TjkNoter",
 };
 </script>
 

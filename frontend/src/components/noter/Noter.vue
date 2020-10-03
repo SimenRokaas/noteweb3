@@ -167,103 +167,25 @@
       />
     </DataTable>
 
-    <Dialog
-      :visible.sync="visDialog"
-      :style="{ width: '600px' }"
-      header="Notedetaljer"
-      :modal="true"
-    >
-      <div class="p-grid p-fluid" v-if="dialogNote">
-        <div v-for="col in allColumns">
-          <div style="margin-bottom: 5px">
-            <label :for="col.field">{{ col.header }}</label>
-            <InputText
-              v-if="col.field === 'ArkivNr'"
-              :id="col.field"
-              v-model="dialogNote[col.field]"
-              :disabled="!kanSkrive"
-              autocomplete="off"
-            />
-            <AutoComplete
-              v-else
-              :id="col.field"
-              v-model="dialogNote[col.field]"
-              :suggestions="autocompleteSuggestions"
-              :disabled="!kanSkrive"
-              @complete="autocompleteSearch($event, col.field)"
-            />
-          </div>
-        </div>
-      </div>
-
-      <template #footer>
-        <div v-if="kanSkrive">
-          <Button
-            v-if="visAvbrytKnapp"
-            label="Avbryt"
-            icon="pi pi-times"
-            @click="visDialog = false"
-            class="p-button-warning"
-            autofocus
-          />
-          <Button
-            v-if="visSlettKnapp"
-            label="Slett"
-            icon="pi pi-times"
-            @click="visBekreftSlettDialog"
-            class="p-button-danger"
-          />
-          <Button
-            label="Lagre"
-            icon="pi pi-check"
-            @click="lagreNote"
-            class="p-button-success"
-          />
-        </div>
-        <div v-else>
-          <Button
-            label="OK"
-            icon="pi pi-check"
-            @click="visDialog = false"
-            class="p-button-success"
-          />
-        </div>
-      </template>
-    </Dialog>
-
-    <Dialog
-      :visible.sync="visBekreftSlett"
-      :style="{ width: '600px' }"
-      header="Bekreft sletting"
-      :modal="true"
-    >
-      <div class="p-grid p-fluid">
-        Er du sikker på at du vil slette note {{ this.arkNrNaa }}?
-      </div>
-
-      <template #footer>
-        <div>
-          <Button
-            label="Avbryt"
-            icon="pi pi-times"
-            @click="visBekreftSlett = false"
-            class="p-button-warning"
-            autofocus
-          />
-          <Button
-            label="OK"
-            icon="pi pi-check"
-            @click="slettNote"
-            class="p-button-success"
-          />
-        </div>
-      </template>
-    </Dialog>
+    <NoteDialog
+      :erSynlig="visDialog"
+      :mode="mode"
+      :dialogNote="dialogNote"
+      :arkNrNaa="arkNrNaa"
+      :noter="noter"
+      :valgtNote="valgtNote"
+      :kanSkrive="kanSkrive"
+      :allColumns="allColumns"
+      :visAvbrytKnapp="visAvbrytKnapp"
+      :visSlettKnapp="visSlettKnapp"
+      @skjul-notedialog="skjulNoteDialog"
+    />
   </div>
 </template>
 
 <script>
 import NoteService from "@/service/NoteService";
+import NoteDialog from "@/components/noter/NoteDialog";
 import XLSX from "xlsx";
 
 const arkivNr = { field: "ArkivNr", header: "Arkivnr" };
@@ -326,11 +248,9 @@ export default {
       visDialog: false,
       visSlettKnapp: true,
       visAvbrytKnapp: false,
-      visBekreftSlett: false,
       mode: "VIS",
       arkNrNaa: null,
       erDev: process.env.NODE_ENV === "development",
-      autocompleteSuggestions: null,
       eksportValg: [
         {
           label: "Alle > Excel",
@@ -382,6 +302,9 @@ export default {
       ],
     };
   },
+  components: {
+    NoteDialog,
+  },
   computed: {
     columns() {
       return this.showAllCols ? allCols : minCols;
@@ -416,87 +339,6 @@ export default {
       this.visAvbrytKnapp = true;
       this.visDialog = true;
     },
-    leggTilNote() {
-      this.mode = "NY";
-      this.arkNrNaa = this.genererArkivnr();
-      this.dialogNote = {
-        ArkivNr: this.arkNrNaa,
-      };
-      this.visSlettKnapp = false;
-      this.visAvbrytKnapp = true;
-      this.visDialog = true;
-    },
-    visBekreftSlettDialog() {
-      this.visBekreftSlett = true;
-    },
-    slettNote() {
-      this.visBekreftSlett = false;
-      NoteService.delete(this.dialogNote)
-        .then((res) => this.handleSuccess(res, "Slettet"))
-        .catch((error) => this.handleError(error));
-      this.visDialog = false;
-      this.dialogNote = null;
-      this.valgtNote = null;
-    },
-    lagreNote() {
-      if (this.mode === "NY") {
-        NoteService.create(this.dialogNote)
-          .then((res) => this.handleSuccess(res, "Opprettet"))
-          .catch((error) => this.handleError(error));
-      } else {
-        NoteService.update(this.dialogNote)
-          .then((res) => this.handleSuccess(res, "Oppdatert"))
-          .catch((error) => this.handleError(error));
-      }
-      this.visDialog = false;
-      this.dialogNote = null;
-      this.valgtNote = null;
-    },
-    handleSuccess(res, text) {
-      const indexOfUpdatedNote = this.noter.findIndex(
-        (n) => n.ArkivNr === this.arkNrNaa
-      );
-      if (text === "Opprettet" || text === "Oppdatert") {
-        const data = JSON.parse(res.config.data);
-        if (text === "Oppdatert") {
-          this.noter.splice(indexOfUpdatedNote, 1, data);
-        }
-        if (text === "Opprettet") {
-          this.noter.unshift(data); // add at beginning of array because of default sorting
-        }
-      }
-      if (text === "Slettet") {
-        this.noter.splice(indexOfUpdatedNote, 1);
-      }
-      this.$toast.add({
-        severity: "success",
-        summary: text,
-        detail: "Note " + this.arkNrNaa + " " + text.toLowerCase() + "!",
-        life: 3000,
-      });
-    },
-    handleError(error) {
-      this.$toast.add({
-        severity: "error",
-        summary: "Feil",
-        detail: error,
-        life: 3000,
-      });
-    },
-    genererArkivnr() {
-      let currentMax = Math.max(...this.noter.map((n) => n.ArkivNr));
-      return currentMax + 1;
-    },
-    autocompleteSearch(event, field) {
-      const fieldArr = this.noter.map((n) => n[field]).filter((f) => f != null);
-      const startsWith = fieldArr.filter((f) =>
-        f.toLowerCase().startsWith(event.query.toLowerCase())
-      );
-      const includes = fieldArr.filter((f) =>
-        f.toLowerCase().includes(event.query.toLowerCase())
-      );
-      this.autocompleteSuggestions = [...new Set(startsWith.concat(includes))];
-    },
     highlightMatches() {
       const searchWords = this.filters["global"].split(" ");
       const tabellen = document.querySelector(".p-datatable-tbody");
@@ -516,6 +358,24 @@ export default {
           }
         });
       });
+    },
+    leggTilNote() {
+      this.mode = "NY";
+      this.arkNrNaa = this.genererArkivnr();
+      this.dialogNote = {
+        ArkivNr: this.arkNrNaa,
+      };
+      this.visSlettKnapp = false;
+      this.visAvbrytKnapp = true;
+      this.visDialog = true;
+    },
+    genererArkivnr() {
+      let currentMax = Math.max(...this.noter.map((n) => n.ArkivNr));
+      return currentMax + 1;
+    },
+    skjulNoteDialog() {
+      this.visDialog = false;
+      this.dialogNote = null;
     },
   },
 };
