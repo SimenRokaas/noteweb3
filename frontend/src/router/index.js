@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 
 import Noter from "@/components/noter/Noter";
+import Test from "@/components/noter/Test";
 
 Vue.use(Router);
 
@@ -12,6 +13,11 @@ export default new Router({
       path: "/",
       name: "noter",
       component: Noter,
+    },
+    {
+      path: "/test",
+      name: "test",
+      component: Test,
     },
   ],
 });

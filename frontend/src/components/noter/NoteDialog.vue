@@ -119,6 +119,7 @@ export default {
       autocompleteSuggestions: null,
       visBekreftSlett: false,
       arkivNrIToast: "",
+      autolayout: true,
     };
   },
   methods: {
