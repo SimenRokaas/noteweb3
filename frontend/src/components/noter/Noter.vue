@@ -40,6 +40,25 @@
       </template>
     </Dialog>
 
+    <table v-if="kanLese || kanSkrive">
+      <tr>
+        <td style="vertical-align: top">
+          <!--suppress HtmlUnknownTarget -->
+          <img
+            src="Tønsberg-Janitsjarkorps-logo-600px-300x300.jpg"
+            alt="TJK logo"
+            width="50"
+          />
+        </td>
+        <td style="vertical-align: middle">
+          <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
+        </td>
+        <td style="vertical-align: middle">
+          <span style="font-size: 12px">v2020.10.04</span>
+        </td>
+      </tr>
+    </table>
+
     <DataTable
       :filters="filters"
       :loading="loading"
@@ -53,7 +72,7 @@
       :sort-order="-1"
       :value="noter"
       @row-select="onRowSelect"
-      auto-layout
+      :auto-layout="!justerbareKolonner"
       class="p-datatable-striped"
       csv-separator="|"
       current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
@@ -69,20 +88,6 @@
       <template #header>
         <table>
           <tr>
-            <td style="float: left; margin-right: 8px">
-              <!--suppress HtmlUnknownTarget -->
-              <img
-                src="Tønsberg-Janitsjarkorps-logo-600px-300x300.jpg"
-                alt="TJK logo"
-                width="50"
-              />
-            </td>
-            <td style="float: left; margin-right: 8px">
-              {{ title }}
-              <span style="horiz-align: left; font-size: 12px">
-                v2020.09.13
-              </span>
-            </td>
             <td style="float: left">
               <span class="p-input-icon-left">
                 <i class="pi pi-search"></i>
@@ -119,9 +124,25 @@
                   Kan skrive (DEV)
                 </label>
               </span>
-              <Checkbox id="showAllCols" v-model="showAllCols" :binary="true" />
+              <Checkbox
+                id="justerbareKolonner"
+                v-model="justerbareKolonner"
+                :binary="true"
+              />
               <label
-                for="showAllCols"
+                for="justerbareKolonner"
+                class="p-checkbox-label"
+                style="font-size: 14px; margin-right: 4px"
+              >
+                Justerbare kolonnebredder
+              </label>
+              <Checkbox
+                id="visAlleKolonner"
+                v-model="visAlleKolonner"
+                :binary="true"
+              />
+              <label
+                for="visAlleKolonner"
                 class="p-checkbox-label"
                 style="font-size: 14px; margin-right: 4px"
               >
@@ -232,25 +253,9 @@ export default {
   name: "Noter",
   data() {
     return {
-      passord: null,
-      passordFeil: false,
-      title: process.env.VUE_APP_TITLE,
-      columnOptions: null,
       allColumns: allCols,
-      showAllCols: false,
-      filters: {},
-      loading: true,
-      noter: [],
-      kanLese: false,
-      kanSkrive: false,
-      valgtNote: null,
-      dialogNote: {},
-      visDialog: false,
-      visSlettKnapp: true,
-      visAvbrytKnapp: false,
-      mode: "VIS",
       arkNrNaa: null,
-      erDev: process.env.NODE_ENV === "development",
+      dialogNote: {},
       eksportValg: [
         {
           label: "Alle > Excel",
@@ -300,6 +305,22 @@ export default {
           },
         },
       ],
+      erDev: process.env.NODE_ENV === "development",
+      filters: {},
+      justerbareKolonner: false,
+      kanLese: false,
+      kanSkrive: false,
+      loading: true,
+      mode: "VIS",
+      noter: [],
+      passord: null,
+      passordFeil: false,
+      tittel: process.env.VUE_APP_TITLE,
+      valgtNote: null,
+      visAlleKolonner: false,
+      visDialog: false,
+      visSlettKnapp: true,
+      visAvbrytKnapp: false,
     };
   },
   components: {
@@ -307,11 +328,8 @@ export default {
   },
   computed: {
     columns() {
-      return this.showAllCols ? allCols : minCols;
+      return this.visAlleKolonner ? allCols : minCols;
     },
-  },
-  created() {
-    this.columnOptions = this.showAllCols ? allCols : minCols;
   },
   mounted() {
     this.title = process.env.VUE_APP_TITLE;
