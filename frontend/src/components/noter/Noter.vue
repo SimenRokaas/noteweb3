@@ -54,7 +54,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2020.10.04</span>
+          <span style="font-size: 12px">v2020.10.10</span>
         </td>
       </tr>
     </table>
@@ -82,7 +82,7 @@
       ref="dt"
       id="notetabell"
       selection-mode="single"
-      sort-field="arkivNr"
+      sort-field="kolArkivNr"
       v-if="kanLese || kanSkrive"
     >
       <template #header>
@@ -94,7 +94,7 @@
                 <InputText
                   v-model="filters['global']"
                   placeholder="Fritekst søk"
-                  size="50"
+                  size="40"
                   @keyup="highlightMatches($event)"
                 />
               </span>
@@ -136,18 +136,13 @@
               >
                 Justerbare kolonnebredder
               </label>
-              <Checkbox
-                id="visAlleKolonner"
-                v-model="visAlleKolonner"
-                :binary="true"
+              <Button
+                icon="pi pi-cog"
+                label="Velg kolonner"
+                @click="visKolonneValgDialog = true"
+                style="margin-right: 4px"
+                class="p-button-help"
               />
-              <label
-                for="visAlleKolonner"
-                class="p-checkbox-label"
-                style="font-size: 14px; margin-right: 4px"
-              >
-                Vis alle kolonner
-              </label>
               <Button
                 icon="pi pi-plus"
                 label="Legg til"
@@ -180,13 +175,21 @@
       <template #loading> Laster noter, vent litt... </template>
 
       <Column
-        v-for="col of columns"
+        v-for="col of valgteKolonner"
         :key="col.field"
         :field="col.field"
         :header="col.header"
         :sortable="true"
       />
     </DataTable>
+
+    <KolonnePicklist
+      :erSynlig="visKolonneValgDialog"
+      :alleKolonner="allColumns"
+      :initieltValgteKolonner="valgteKolonner"
+      @skjul-kolonnevalg="skjulKolonneValgDialog"
+      @valgte-kolonner="oppdaterValgteKolonner"
+    />
 
     <NoteDialog
       :erSynlig="visDialog"
@@ -206,10 +209,11 @@
 
 <script>
 import NoteService from "@/service/NoteService";
+import KolonnePicklist from "@/components/noter/KolonnePicklist";
 import NoteDialog from "@/components/noter/NoteDialog";
 import XLSX from "xlsx";
 
-const arkivNr = { field: "ArkivNr", header: "Arkivnr" };
+const kolArkivNr = { field: "ArkivNr", header: "Arkivnr" };
 const kolTittel1 = { field: "Tittel1", header: "Tittel" };
 const kolTittel2 = { field: "Tittel2", header: "Tittel 2" };
 const kolSolo = { field: "Soloinstrument", header: "Solo-instr" };
@@ -225,7 +229,7 @@ const kolArrangertFor1 = { field: "ArrangertFor1", header: "Arrangert for" };
 const kolArrangertFor2 = { field: "ArrangertFor2", header: "Arrangert for 2" };
 
 const allCols = [
-  arkivNr,
+  kolArkivNr,
   kolTittel1,
   kolTittel2,
   kolSolo,
@@ -241,7 +245,7 @@ const allCols = [
   kolArrangertFor2,
 ];
 const minCols = [
-  arkivNr,
+  kolArkivNr,
   kolTittel1,
   kolKategori1,
   kolKomponist,
@@ -308,6 +312,7 @@ export default {
       erDev: process.env.NODE_ENV === "development",
       filters: {},
       justerbareKolonner: false,
+      valgteKolonner: minCols,
       kanLese: false,
       kanSkrive: false,
       loading: true,
@@ -317,19 +322,15 @@ export default {
       passordFeil: false,
       tittel: process.env.VUE_APP_TITLE,
       valgtNote: null,
-      visAlleKolonner: false,
-      visDialog: false,
-      visSlettKnapp: true,
       visAvbrytKnapp: false,
+      visDialog: false,
+      visKolonneValgDialog: false,
+      visSlettKnapp: true,
     };
   },
   components: {
+    KolonnePicklist,
     NoteDialog,
-  },
-  computed: {
-    columns() {
-      return this.visAlleKolonner ? allCols : minCols;
-    },
   },
   mounted() {
     this.title = process.env.VUE_APP_TITLE;
@@ -394,6 +395,12 @@ export default {
     skjulNoteDialog() {
       this.visDialog = false;
       this.dialogNote = null;
+    },
+    skjulKolonneValgDialog() {
+      this.visKolonneValgDialog = false;
+    },
+    oppdaterValgteKolonner(kol) {
+      this.valgteKolonner = kol;
     },
   },
 };
