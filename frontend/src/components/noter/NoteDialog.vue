@@ -134,7 +134,10 @@ export default {
       const includes = fieldArr.filter((f) =>
         f.toLowerCase().includes(event.query.toLowerCase())
       );
-      this.autocompleteSuggestions = [...new Set(startsWith.concat(includes))];
+      const list = [...new Set(startsWith.concat(includes))]; // set for unique values
+      this.autocompleteSuggestions = list.map((it) =>
+        it.length > 50 ? it.substring(0, 50) + "..." : it
+      );
     },
     slettNote() {
       this.arkivNrIToast = this.dialogNote.ArkivNr;
