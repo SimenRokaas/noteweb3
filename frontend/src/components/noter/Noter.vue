@@ -202,6 +202,7 @@
       :allColumns="allColumns"
       :visAvbrytKnapp="visAvbrytKnapp"
       :visSlettKnapp="visSlettKnapp"
+      :erDigital="erDigital"
       @skjul-notedialog="skjulNoteDialog"
     />
   </div>
@@ -326,6 +327,7 @@ export default {
       visDialog: false,
       visKolonneValgDialog: false,
       visSlettKnapp: true,
+      erDigital: false,
     };
   },
   components: {
@@ -354,6 +356,7 @@ export default {
       this.arkNrNaa = event.data.ArkivNr;
       this.mode = "ENDRE";
       this.dialogNote = { ...event.data };
+      this.erDigital = this.dialogNote["Kommentar"].startsWith("Digital");
       this.visSlettKnapp = true;
       this.visAvbrytKnapp = true;
       this.visDialog = true;

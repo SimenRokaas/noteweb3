@@ -32,37 +32,42 @@
       </div>
 
       <template #footer>
-        <div v-if="kanSkrive">
-          <Button
-            v-if="visAvbrytKnapp"
-            label="Avbryt"
-            icon="pi pi-times"
-            @click="skjulNoteDialog"
-            class="p-button-warning"
-            autofocus
-          />
-          <Button
-            v-if="visSlettKnapp"
-            label="Slett"
-            icon="pi pi-times"
-            @click="visBekreftSlettDialog"
-            class="p-button-danger"
-          />
-          <Button
-            label="Lagre"
-            icon="pi pi-check"
-            @click="lagreNote"
-            class="p-button-success"
-          />
-        </div>
-        <div v-else>
-          <Button
-            label="OK"
-            icon="pi pi-check"
-            @click="skjulNoteDialog"
-            class="p-button-success"
-          />
-        </div>
+        <Button
+          v-if="erDigital"
+          label="Vis noter"
+          icon="pi pi-star"
+          @click="sjekkDigital"
+          class="p-button-info"
+        />
+        <Button
+          v-if="kanSkrive && visAvbrytKnapp"
+          label="Avbryt"
+          icon="pi pi-times"
+          @click="skjulNoteDialog"
+          class="p-button-warning"
+          autofocus
+        />
+        <Button
+          v-if="kanSkrive && visSlettKnapp"
+          label="Slett"
+          icon="pi pi-times"
+          @click="visBekreftSlettDialog"
+          class="p-button-danger"
+        />
+        <Button
+          v-if="kanSkrive"
+          label="Lagre"
+          icon="pi pi-check"
+          @click="lagreNote"
+          class="p-button-success"
+        />
+        <Button
+          v-if="!kanSkrive"
+          label="OK"
+          icon="pi pi-check"
+          @click="skjulNoteDialog"
+          class="p-button-success"
+        />
       </template>
     </Dialog>
 
@@ -113,6 +118,7 @@ export default {
     "allColumns",
     "visAvbrytKnapp",
     "visSlettKnapp",
+    "erDigital",
   ],
   data() {
     return {
@@ -208,6 +214,10 @@ export default {
     },
     skjulNoteDialog() {
       this.$emit("skjul-notedialog");
+    },
+    sjekkDigital() {
+      console.log("Hu hei hvor det går!");
+      // teste om det går å få tak i pdf for 2022 Cavatina
     },
   },
 };
