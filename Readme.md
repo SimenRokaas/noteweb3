@@ -19,6 +19,14 @@ Backend kjøres lokalt med NODE_ENV=production slik at frontend serves fra dist-
     npm run prod-local // kjører med NODE_ENV=production
 
 ### Oppdatere på server
+
+#### Den enkle måten
+    ./shipit.sh
+    
+Skriptet vil spørre om ssh-passord to ganger.
+
+#### Den manuelle måten
+
 Frontend bygges med NODE_ENV=production slik at API-kall går til https://tjk.no/notearkiv/noter
 
 Backend kjøres (på server) med NODE_ENV=production slik at frontend serves fra dist-folder.
@@ -28,6 +36,8 @@ Backend kjøres (på server) med NODE_ENV=production slik at frontend serves fra
 
 1. Last opp backend-katalogen + frontend/dist til server
 1. Sjekk oppsett på server - se node.js setup på webhotell (A2 hosting)
+
+Se `shipit.sh`for detaljer om overføring til server.
 
 ## Oppdatere npm-avhengigheter
     npx npm-check-updates -u
