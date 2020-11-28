@@ -6,11 +6,11 @@
       header="Logg inn"
       :modal="true"
     >
-      <div class="p-grid p-fluid" style="margin-bottom: 5px">
+      <div class="p-fluid" style="margin-bottom: 5px">
         Du må logge på notearkivet separat. Oppgi passord nedenfor.
       </div>
 
-      <div class="p-grid p-fluid">
+      <div class="p-fluid">
         <div style="margin-bottom: 5px">
           <Password
             v-model="passord"
