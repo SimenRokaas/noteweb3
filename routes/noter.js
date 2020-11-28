@@ -5,6 +5,10 @@ const router = express.Router();
 
 const pool = require("../database");
 
+const axios = require("axios");
+const $ = require("cheerio");
+const NOTESKANN_BASE = "https://tjk.no/TJK-medlem/02 Noteskann/";
+
 router.get("/list", (req, res) => {
   pool.query("select * from noter order by arkivNr desc", (error, noter) => {
     if (error) {
@@ -32,7 +36,7 @@ router.put("/:id", (req, res) => {
 
 router.post("/", (req, res) => {
   console.log("Oppretter arkivnr " + req.body.arkivNr);
-  pool.query("insert into noter set ?;", record(req), (error, results) => {
+  pool.query("insert into noter set ?", record(req), (error, results) => {
     if (error) {
       console.error(JSON.stringify(error));
       throw error;
@@ -57,6 +61,57 @@ router.delete("/:id", (req, res) => {
   );
 });
 
+router.get("/skanliste/:id", (req, res) => {
+  const arkivNr = req.params.id;
+  const hundrerMappeUrl = getHundrerMappeUrl(arkivNr);
+
+  getHtmlContent(hundrerMappeUrl).then((html) => {
+    const linkObjects = $("a", html);
+    let funnet = false;
+    linkObjects.each((i, link) => {
+      // finn link som matcher arkivnr
+      const href = $(link).attr("href");
+      if (href.startsWith(arkivNr)) {
+        funnet = true;
+        const noteUrl = hundrerMappeUrl + "/" + href;
+        getHtmlContent(noteUrl).then((html) => {
+          const partObjects = $("a", html);
+          const links = [];
+          partObjects.each((i, part) => {
+            links.push({
+              text: $(part).text(),
+              href: noteUrl + "/" + $(part).attr("href"),
+            });
+          });
+          res.send(links);
+        });
+      }
+    });
+    if (!funnet) {
+      res.send([]); // "Skannet note " + arkivNr + " ikke funnet!");
+    }
+  });
+});
+
+function getHundrerMappeUrl(arkivNr) {
+  // genererer linker fra arkivnr
+  // arkivnr 1-100 har mappe 99 Arkivnr 1-100
+  // arkivnr 101-200 har mappe 98 Arkivnr 101-200
+  // osv
+  const num = Math.floor((arkivNr - 1) / 100);
+  const hundrerMappeNr = 99 - num;
+  const fra = num * 100 + 1;
+  const til = fra + 99;
+  return NOTESKANN_BASE + hundrerMappeNr + " Arkivnr " + fra + "-" + til;
+}
+
+function getHtmlContent(url) {
+  return axios
+    .get(url)
+    .then((res) => res.data)
+    .catch((error) => console.error(error));
+}
+
 function record(req) {
   return {
     arkivNr: blankIfNull(req.body.ArkivNr),
@@ -72,7 +127,7 @@ function record(req) {
     land: blankIfNull(req.body.Land),
     arrangor: blankIfNull(req.body.Arrangor),
     arrangertFor1: blankIfNull(req.body.ArrangertFor1),
-    arrangertFor2: blankIfNull(req.body.ArrangertFor2)
+    arrangertFor2: blankIfNull(req.body.ArrangertFor2),
   };
 }
 

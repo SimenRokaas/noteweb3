@@ -4,11 +4,11 @@
     <Dialog
       :visible="erSynlig"
       :style="{ width: '600px' }"
-      header="Notedetaljer"
-      :modal="true"
+      :header="getHeader()"
+      modal
       :closable="false"
     >
-      <div class="p-grid p-fluid" v-if="dialogNote">
+      <div class="p-fluid" v-if="dialogNote">
         <div v-for="col in allColumns">
           <div style="margin-bottom: 5px">
             <label :for="col.field">{{ col.header }}</label>
@@ -34,6 +34,11 @@
       <template #footer>
         <div v-if="kanSkrive">
           <Button
+            label="Noter"
+            icon="pi pi-file-pdf"
+            @click="visNoteskannDialog"
+          />
+          <Button
             v-if="visAvbrytKnapp"
             label="Avbryt"
             icon="pi pi-times"
@@ -56,6 +61,13 @@
           />
         </div>
         <div v-else>
+          <span v-show="skannedeNoter.length > 0">
+            <Button
+              label="Noter"
+              icon="pi pi-file-pdf"
+              @click="visNoteskannDialog"
+            />
+          </span>
           <Button
             label="OK"
             icon="pi pi-check"
@@ -65,6 +77,13 @@
         </div>
       </template>
     </Dialog>
+
+    <NoteskannLenkerDialog
+      :erSynlig="visNoteskannLenkerDialog"
+      :arkivNr="arkNrNaa"
+      :lenker="skannedeNoter"
+      @skjul-noteskannlenkerdialog="skjulNoteskannLenkerDialog"
+    />
 
     <Dialog
       :visible.sync="visBekreftSlett"
@@ -99,9 +118,11 @@
 
 <script>
 import NoteService from "@/service/NoteService";
+import NoteskannLenkerDialog from "./NoteskannLenkerDialog";
 
 export default {
   name: "NoteDialog",
+  components: { NoteskannLenkerDialog },
   props: [
     "erSynlig",
     "mode",
@@ -114,15 +135,27 @@ export default {
     "visAvbrytKnapp",
     "visSlettKnapp",
   ],
+  watch: {
+    arkNrNaa(newValue) {
+      NoteService.getSkanListe(newValue)
+        .then((res) => (this.skannedeNoter = res))
+        .catch((error) => this.handleError(error));
+    },
+  },
   data() {
     return {
       autocompleteSuggestions: null,
       visBekreftSlett: false,
       arkivNrIToast: "",
       autolayout: true,
+      skannedeNoter: [],
+      visNoteskannLenkerDialog: false,
     };
   },
   methods: {
+    getHeader() {
+      return "Notedetaljer arkivnr " + this.arkNrNaa;
+    },
     visBekreftSlettDialog() {
       this.visBekreftSlett = true;
     },
@@ -208,6 +241,12 @@ export default {
     },
     skjulNoteDialog() {
       this.$emit("skjul-notedialog");
+    },
+    visNoteskannDialog() {
+      this.visNoteskannLenkerDialog = true;
+    },
+    skjulNoteskannLenkerDialog() {
+      this.visNoteskannLenkerDialog = false;
     },
   },
 };

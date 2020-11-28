@@ -8,6 +8,6 @@ export default () => {
 
   return axios.create({
     baseURL: apiUrl,
-    withCredentials: true
+    withCredentials: true,
   });
 };

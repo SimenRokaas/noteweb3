@@ -2,6 +2,9 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 
+import axios from "axios";
+import VueAxios from "vue-axios";
+
 import AutoComplete from "primevue/autocomplete";
 import Button from "primevue/button";
 import Checkbox from "primevue/checkbox";
@@ -18,6 +21,8 @@ import Toast from "primevue/toast";
 import ToastService from "primevue/toastservice";
 
 Vue.use(ToastService);
+
+Vue.use(VueAxios, axios);
 
 Vue.component("AutoComplete", AutoComplete);
 Vue.component("Button", Button);
