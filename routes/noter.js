@@ -79,8 +79,8 @@ router.get("/skanliste/:id", (req, res) => {
           const links = [];
           partObjects.each((i, part) => {
             links.push({
-              text: $(part).text(),
-              href: noteUrl + "/" + $(part).attr("href"),
+              text: $(part).text().trim(),
+              href: noteUrl + $(part).attr("href"),
             });
           });
           res.send(links);

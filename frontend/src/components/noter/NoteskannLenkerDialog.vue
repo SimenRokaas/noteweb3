@@ -12,7 +12,11 @@
         {{ lenker }}
       </div>
       <div v-else v-for="lenke in lenker">
-        <a :href="lenke.href" target="_blank">{{ lenke.text }}</a>
+        <Button
+          :label="lenke.text"
+          class="p-button-link"
+          @click="getNote(lenke)"
+        />
       </div>
       <p />
       <Button
@@ -26,6 +30,8 @@
 </template>
 
 <script>
+import download from "downloadjs";
+
 export default {
   name: "NoteskannLenker",
   props: ["erSynlig", "arkivNr", "lenker"],
@@ -35,6 +41,24 @@ export default {
     },
     skjulNoteskannLenkerDialog() {
       this.$emit("skjul-noteskannlenkerdialog");
+    },
+    getNote(link) {
+      console.log("Downloading " + link.href + " ...");
+      const x = new XMLHttpRequest();
+      x.open("GET", link.href, true);
+      x.responseType = "blob";
+      x.onload = function (e) {
+        download(e.target.response, link.text, "application/pdf");
+      };
+      x.send();
+    },
+    handleError(error) {
+      this.$toast.add({
+        severity: "error",
+        summary: "Feil",
+        detail: error,
+        life: 3000,
+      });
     },
   },
 };
