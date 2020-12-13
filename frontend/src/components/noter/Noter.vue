@@ -54,7 +54,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2020.11.28</span>
+          <span style="font-size: 12px">v2020.12.12</span>
         </td>
       </tr>
     </table>
@@ -161,10 +161,7 @@
               <Button
                 icon="pi pi-sign-out"
                 label="Logg ut"
-                @click="
-                  if (kanSkrive) kanSkrive = false;
-                  if (kanLese) kanLese = false;
-                "
+                @click="loggUt"
                 class="p-button-warning"
               ></Button>
             </td>
@@ -401,6 +398,14 @@ export default {
     },
     oppdaterValgteKolonner(kol) {
       this.valgteKolonner = kol;
+    },
+    loggUt() {
+      if (this.kanSkrive) {
+        this.kanSkrive = false;
+      }
+      if (this.kanLese) {
+        this.kanLese = false;
+      }
     },
   },
 };
