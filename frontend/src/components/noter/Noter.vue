@@ -54,7 +54,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2020.12.12</span>
+          <span style="font-size: 12px">v2020.12.13</span>
         </td>
       </tr>
     </table>

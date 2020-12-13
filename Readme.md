@@ -53,23 +53,23 @@ og underliggende mapper underlagt tilgangskontroll med `.htaccess` på server, s
 
     # Tillat listing av mapper slik at notearkiv kan generere linker til noter
     Options +Indexes
+    # Undertrykker endel kolonner slik at det blir enklere å parse listingen
     IndexOptions SuppressSize SuppressDescription SuppressLastModified SuppressColumnsorting
+    # Undertrykker stående katalog (.) og overliggende katalog (..) slik at det blir enklere å parse listingen
     IndexIgnore . ..
-    
-    # Deny access to files with given extensions
+
+    # tillat http-requests fra noter.tjk.no og fra dev-maskin
+    Header set Access-Control-Allow-Origin '*'
+
+    # Setter miljøvariabel hvis vi klient er axios (= noteweb)
+    SetEnvIf User-Agent ^axios.* tjknoter
+
+    # Nekter tilgang til gitte filtyper
     <FilesMatch "\.(png|jpg|jpeg|gif|pdf|doc|docx|csv|xls|xslx)$">
     Order deny,allow
     Deny from all
-    # Tillat fra PROD
-    Allow from noter.tjk.no
-    Allow from xxx.xxx.xxx.xxx
+    # Tillat fra PROD når miljøvariabel er satt
+    Allow from env=tjknoter
     # Tillat fra dev-maskin
     Allow from xxx.xxx.xxx.xxx
-    
     </FilesMatch>
-    
-Første linje gjør at alle kan liste kataloger, men de framstår tomme hvis
-man ikke kommer fra `noter.tjk.no` eller DEV-maskin.
-`IndexOptions` må være slik for at link-generering skal fungere i `noter.js`.
-
-NB: Per desember 2020 ser det ut til at allow-from bare fungerer med IP.
