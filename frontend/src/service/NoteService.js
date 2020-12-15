@@ -30,4 +30,10 @@ export default class NoteService {
       .get("/noter/skanliste/" + arkivnr)
       .then((res) => res.data);
   }
+
+  static auth(pwd) {
+    return Api()
+      .post("/noter/auth/", { pwd: pwd })
+      .then((res) => res.data);
+  }
 }
