@@ -338,14 +338,13 @@ export default {
   },
   methods: {
     settRolle() {
-      if (this.passord === "tonekunst") {
-        this.kanLese = true;
-      } else if (this.passord === "ravikra") {
-        this.kanLese = true;
-        this.kanSkrive = true;
-      } else {
-        this.passordFeil = true;
-      }
+      NoteService.auth(this.passord).then((data) => {
+        this.kanLese = data.kanLese;
+        this.kanSkrive = data.kanSkrive;
+        if (!this.kanLese && !this.kanSkrive) {
+          this.passordFeil = true;
+        }
+      });
     },
     onRowSelect(event) {
       this.arkNrNaa = event.data.ArkivNr;

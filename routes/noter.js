@@ -45,6 +45,22 @@ router.post("/", (req, res) => {
   });
 });
 
+router.post("/auth", (req, res) => {
+  const roller = {
+    kanLese: false,
+    kanSkrive: false,
+  };
+  if (req.body.pwd === "tonekunst") {
+    roller.kanLese = true;
+    console.log("Autentisert lesetilgang.");
+  } else if (req.body.pwd === "ravikra") {
+    roller.kanLese = true;
+    roller.kanSkrive = true;
+    console.log("Autentisert lese- og skrivetilgang.");
+  }
+  res.send(roller);
+});
+
 router.delete("/:id", (req, res) => {
   var arkivNr = req.params.id;
   console.log("Sletter arkivnr " + arkivNr);
