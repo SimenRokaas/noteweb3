@@ -1,44 +1,44 @@
 <template>
   <div>
-    <Dialog
-      :visible="!kanLese && !kanSkrive"
-      :style="{ width: '600px' }"
-      header="Logg inn"
-      :modal="true"
-    >
-      <div class="p-fluid" style="margin-bottom: 5px">
-        Du må logge på notearkivet separat. Oppgi passord nedenfor.
-      </div>
+<!--    <Dialog-->
+<!--      :visible="!kanLese && !kanSkrive"-->
+<!--      :style="{ width: '600px' }"-->
+<!--      header="Logg inn"-->
+<!--      :modal="true"-->
+<!--    >-->
+<!--      <div class="p-fluid" style="margin-bottom: 5px">-->
+<!--        Du må logge på notearkivet separat. Oppgi passord nedenfor.-->
+<!--      </div>-->
 
-      <div class="p-fluid">
-        <div style="margin-bottom: 5px">
-          <Password
-            v-model="passord"
-            autofocus
-            :feedback="false"
-            @keyup.enter.native="settRolle"
-          />
-        </div>
-      </div>
+<!--      <div class="p-fluid">-->
+<!--        <div style="margin-bottom: 5px">-->
+<!--          <Password-->
+<!--            v-model="passord"-->
+<!--            autofocus-->
+<!--            :feedback="false"-->
+<!--            @keyup.enter.native="settRolle"-->
+<!--          />-->
+<!--        </div>-->
+<!--      </div>-->
 
-      <template #footer>
-        <div
-          v-if="passordFeil"
-          class="p-grid p-fluid"
-          style="margin-bottom: 5px; color: red"
-        >
-          Feil/ukjent passord. Prøv igjen!
-        </div>
-        <div>
-          <Button
-            label="OK"
-            icon="pi pi-check"
-            @click="settRolle"
-            class="p-button-success"
-          />
-        </div>
-      </template>
-    </Dialog>
+<!--      <template #footer>-->
+<!--        <div-->
+<!--          v-if="passordFeil"-->
+<!--          class="p-grid p-fluid"-->
+<!--          style="margin-bottom: 5px; color: red"-->
+<!--        >-->
+<!--          Feil/ukjent passord. Prøv igjen!-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <Button-->
+<!--            label="OK"-->
+<!--            icon="pi pi-check"-->
+<!--            @click="settRolle"-->
+<!--            class="p-button-success"-->
+<!--          />-->
+<!--        </div>-->
+<!--      </template>-->
+<!--    </Dialog>-->
 
     <table v-if="kanLese || kanSkrive">
       <tr>
@@ -54,7 +54,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2020.12.13</span>
+          <span style="font-size: 12px">v2021.01.02</span>
         </td>
       </tr>
     </table>
@@ -205,6 +205,7 @@
 </template>
 
 <script>
+import AuthService from "@/service/AuthService";
 import NoteService from "@/service/NoteService";
 import KolonnePicklist from "@/components/noter/KolonnePicklist";
 import NoteDialog from "@/components/noter/NoteDialog";
@@ -335,6 +336,16 @@ export default {
       this.noter = data;
       this.loading = false;
     });
+    AuthService.user().then((user) => {
+      if (user.rolle === "les") {
+        this.kanLese = true;
+        this.kanSkrive = false;
+      }
+      if (user.rolle === "skriv") {
+        this.kanLese = true;
+        this.kanSkrive = true;
+      }
+    });
   },
   methods: {
     settRolle() {
@@ -399,12 +410,10 @@ export default {
       this.valgteKolonner = kol;
     },
     loggUt() {
-      if (this.kanSkrive) {
+      AuthService.logout().then(() => {
         this.kanSkrive = false;
-      }
-      if (this.kanLese) {
         this.kanLese = false;
-      }
+      });
     },
   },
 };

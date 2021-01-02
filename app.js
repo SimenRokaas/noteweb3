@@ -3,9 +3,14 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const conn = require("./database");
 const app = express();
+const cookieSession = require("cookie-session");
+const passport = require("passport");
+
+// getting the local authentication type
+const LocalStrategy = require("passport-local").Strategy;
 
 // init db by querying number of notes
-conn.query("select count(*) as antall from noter", function(error, antall) {
+conn.query("select count(*) as antall from noter", function (error, antall) {
   if (error) {
     console.error(error);
   }
@@ -21,12 +26,63 @@ if (process.env.NODE_ENV === "development") {
     cors({
       origin: "http://localhost:8080",
       credentials: true,
-      optionsSuccessStatus: 204
+      optionsSuccessStatus: 204,
     })
   );
 }
 
+// init auth cookie
+app.use(
+  cookieSession({
+    name: "tjknoter-session",
+    keys: ["vueauthrandomkey"],
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
+
+let users = [];
+conn.query("select * from noter_brukere", function (error, result) {
+  if (error) {
+    console.error(error);
+  }
+  users = result;
+  console.log("Antall brukere i databasen: " + users.length);
+});
+
+// init auth with passport
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "bruker",
+      passwordField: "passord",
+    },
+    (username, password, done) => {
+      let user = users.find((user) => {
+        return Buffer.from(password).toString("base64") === user.passord;
+      });
+
+      if (user) {
+        done(null, user);
+      } else {
+        done(null, false, { message: "Feil brukernavn eller passord" });
+      }
+    }
+  )
+);
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+passport.deserializeUser((id, done) => {
+  let user = users.find((user) => {
+    return user.id === id;
+  });
+  done(null, user);
+});
+
 // routes for the app
+app.use("/auth", require("./routes/auth").router);
 app.use("/noter", require("./routes/noter"));
 
 console.log("Env: " + process.env.NODE_ENV);

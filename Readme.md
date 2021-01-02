@@ -3,7 +3,7 @@
 ![alt text](vue-node-express-mysql-architecture.png "Architecture")
 
 ### Backend
-Node + Express + Cors + MySql
+Node + Express + Cors + MySql + Passport
 
 ### Frontend
 PrimeVue + Axios
@@ -73,3 +73,6 @@ og underliggende mapper underlagt tilgangskontroll med `.htaccess` på server, s
     # Tillat fra dev-maskin
     Allow from xxx.xxx.xxx.xxx
     </FilesMatch>
+
+## Autentisering
+Se https://blog.jscrambler.com/vue-js-authentication-system-with-node-js-backend/
