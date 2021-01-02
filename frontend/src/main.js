@@ -42,6 +42,8 @@ import "primevue/resources/themes/nova/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 
+import VueCookies from "vue-cookies";
+Vue.use(VueCookies);
 Vue.config.productionTip = false;
 
 new Vue({

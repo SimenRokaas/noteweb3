@@ -9,7 +9,9 @@ const axios = require("axios");
 const $ = require("cheerio");
 const NOTESKANN_BASE = "https://tjk.no/TJK-medlem/02 Noteskann/";
 
-router.get("/list", (req, res) => {
+const auth = require("./auth");
+
+router.get("/list", auth.authMiddleware, (req, res) => {
   pool.query("select * from noter order by arkivNr desc", (error, noter) => {
     if (error) {
       console.error(error);
@@ -18,7 +20,7 @@ router.get("/list", (req, res) => {
   });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", auth.authMiddleware, (req, res) => {
   var arkivNr = req.params.id;
   console.log("Oppdaterer arkivnr " + arkivNr);
   pool.query(
@@ -34,7 +36,7 @@ router.put("/:id", (req, res) => {
   );
 });
 
-router.post("/", (req, res) => {
+router.post("/", auth.authMiddleware, (req, res) => {
   console.log("Oppretter arkivnr " + req.body.arkivNr);
   pool.query("insert into noter set ?", record(req), (error, results) => {
     if (error) {
@@ -61,7 +63,7 @@ router.post("/auth", (req, res) => {
   res.send(roller);
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", auth.authMiddleware, (req, res) => {
   var arkivNr = req.params.id;
   console.log("Sletter arkivnr " + arkivNr);
   pool.query(
@@ -77,7 +79,7 @@ router.delete("/:id", (req, res) => {
   );
 });
 
-router.get("/skanliste/:id", (req, res) => {
+router.get("/skanliste/:id", auth.authMiddleware, (req, res) => {
   const arkivNr = req.params.id;
   const hundrerMappeUrl = getHundrerMappeUrl(arkivNr);
 
