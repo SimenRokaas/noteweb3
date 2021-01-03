@@ -5,25 +5,22 @@ export default class AuthService {
   static login(data) {
     return Api()
       .post("/auth/login", data)
-      .then((res) => {
+      .then(() => {
         router.push({ name: "Noter" });
       })
       .catch((err) => {
-        console.error(err);
-        console.log("Feil under innlogging");
+        throw err;
       });
   }
 
   static logout() {
     return Api()
       .get("/auth/logout")
-      .then((res) => {
-        console.log("Logget ut");
+      .then(() => {
         router.push({ name: "Login" });
       })
       .catch((err) => {
         console.error(err);
-        console.log("Feil under utlogging");
       });
   }
 
@@ -35,7 +32,7 @@ export default class AuthService {
       })
       .catch((err) => {
         console.error(err);
-        console.log("Feil ved henting av bruker");
+        router.push({ name: "Login" });
       });
   }
 }

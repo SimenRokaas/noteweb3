@@ -1,10 +1,13 @@
 <template>
-  <div>
-    <h2>Login</h2>
+  <Dialog
+    :visible="!innlogget"
+    :style="{ width: '600px' }"
+    header="Logg inn"
+    modal
+  >
     <div class="p-fluid" style="margin-bottom: 5px">
       Du må logge på notearkivet separat. Oppgi passord nedenfor.
     </div>
-
     <div class="p-fluid">
       <div style="margin-bottom: 5px">
         <Password
@@ -15,7 +18,6 @@
         />
       </div>
     </div>
-
     <div
       v-if="passordFeil"
       class="p-grid p-fluid"
@@ -31,7 +33,7 @@
         class="p-button-success"
       />
     </div>
-  </div>
+  </Dialog>
 </template>
 
 <script>
@@ -41,6 +43,7 @@ export default {
   name: "Login",
   data() {
     return {
+      innlogget: false,
       passord: null,
       passordFeil: false,
     };
@@ -52,8 +55,8 @@ export default {
         bruker: "ingen",
         passord: this.passord,
       })
-        .then((user) => {
-          console.log("Logget inn med rolle '" + user.rolle + "'");
+        .then(() => {
+          this.innlogget = true;
         })
         .catch(() => {
           this.passordFeil = true;
