@@ -1,45 +1,5 @@
 <template>
   <div>
-<!--    <Dialog-->
-<!--      :visible="!kanLese && !kanSkrive"-->
-<!--      :style="{ width: '600px' }"-->
-<!--      header="Logg inn"-->
-<!--      :modal="true"-->
-<!--    >-->
-<!--      <div class="p-fluid" style="margin-bottom: 5px">-->
-<!--        Du må logge på notearkivet separat. Oppgi passord nedenfor.-->
-<!--      </div>-->
-
-<!--      <div class="p-fluid">-->
-<!--        <div style="margin-bottom: 5px">-->
-<!--          <Password-->
-<!--            v-model="passord"-->
-<!--            autofocus-->
-<!--            :feedback="false"-->
-<!--            @keyup.enter.native="settRolle"-->
-<!--          />-->
-<!--        </div>-->
-<!--      </div>-->
-
-<!--      <template #footer>-->
-<!--        <div-->
-<!--          v-if="passordFeil"-->
-<!--          class="p-grid p-fluid"-->
-<!--          style="margin-bottom: 5px; color: red"-->
-<!--        >-->
-<!--          Feil/ukjent passord. Prøv igjen!-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <Button-->
-<!--            label="OK"-->
-<!--            icon="pi pi-check"-->
-<!--            @click="settRolle"-->
-<!--            class="p-button-success"-->
-<!--          />-->
-<!--        </div>-->
-<!--      </template>-->
-<!--    </Dialog>-->
-
     <table v-if="kanLese || kanSkrive">
       <tr>
         <td style="vertical-align: top">
@@ -332,10 +292,6 @@ export default {
   },
   mounted() {
     this.title = process.env.VUE_APP_TITLE;
-    NoteService.fetchNoter().then((data) => {
-      this.noter = data;
-      this.loading = false;
-    });
     AuthService.user().then((user) => {
       if (user.rolle === "les") {
         this.kanLese = true;
@@ -346,17 +302,12 @@ export default {
         this.kanSkrive = true;
       }
     });
+    NoteService.fetchNoter().then((data) => {
+      this.noter = data;
+      this.loading = false;
+    });
   },
   methods: {
-    settRolle() {
-      NoteService.auth(this.passord).then((data) => {
-        this.kanLese = data.kanLese;
-        this.kanSkrive = data.kanSkrive;
-        if (!this.kanLese && !this.kanSkrive) {
-          this.passordFeil = true;
-        }
-      });
-    },
     onRowSelect(event) {
       this.arkNrNaa = event.data.ArkivNr;
       this.mode = "ENDRE";
