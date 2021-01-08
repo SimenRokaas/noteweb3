@@ -8,3 +8,4 @@
 *.sw?
 node_modules
 *.tgz
+.env
