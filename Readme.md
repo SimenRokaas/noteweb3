@@ -75,4 +75,14 @@ og underliggende mapper underlagt tilgangskontroll med `.htaccess` på server, s
     </FilesMatch>
 
 ## Autentisering
-Se https://blog.jscrambler.com/vue-js-authentication-system-with-node-js-backend/
+
+Passport.js brukes for autentisering. Innlogget brukers sesjons-ID holdes i
+en cookie med 24t varighet.
+
+Det finnes bare to felles-brukere: en med les-rettighet og en med skriv/les-
+rettighet. Innlogging skjer kun med passord - appen finner bruker ved å sammenligne
+oppgitt passord med de to som ligger i DB.
+
+Autentiseringsløsningen er inspirert av
+https://blog.jscrambler.com/vue-js-authentication-system-with-node-js-backend/
+men er forenklet siden vi kun har to felles-brukere.
