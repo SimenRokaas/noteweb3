@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table v-if="kanLese || kanSkrive">
+    <table>
       <tr>
         <td style="vertical-align: top">
           <!--suppress HtmlUnknownTarget -->
@@ -14,7 +14,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2021.01.02</span>
+          <span style="font-size: 12px">v2021.01.12</span>
         </td>
       </tr>
     </table>
