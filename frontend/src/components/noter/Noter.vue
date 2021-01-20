@@ -55,7 +55,7 @@
                   v-model="filters['global']"
                   placeholder="Fritekst søk"
                   size="40"
-                  @keyup="highlightMatches($event)"
+                  @keyup="searchUsingQuery()"
                 />
               </span>
             </td>
@@ -306,6 +306,9 @@ export default {
       this.noter = data;
       this.loading = false;
     });
+    if (this.$route.query.search) {
+      this.filters["global"] = this.$route.query.search;
+    }
   },
   methods: {
     onRowSelect(event) {
@@ -315,6 +318,21 @@ export default {
       this.visSlettKnapp = true;
       this.visAvbrytKnapp = true;
       this.visDialog = true;
+    },
+    searchUsingQuery() {
+      this.$router
+        .push({
+          path: "noter",
+          query: { search: this.filters["global"] },
+        })
+        .then(() => {
+          this.highlightMatches();
+        })
+        .catch((error) => {
+          if (error.name !== "NavigationDuplicated") {
+            throw error;
+          }
+        });
     },
     highlightMatches() {
       const searchWords = this.filters["global"].split(" ");
