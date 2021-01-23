@@ -130,6 +130,7 @@ function record(req) {
     arrangor: blankIfNull(req.body.Arrangor),
     arrangertFor1: blankIfNull(req.body.ArrangertFor1),
     arrangertFor2: blankIfNull(req.body.ArrangertFor2),
+    prosjekt: blankIfNull(req.body.Prosjekt),
   };
 }
 

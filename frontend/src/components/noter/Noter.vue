@@ -14,7 +14,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2021.01.12</span>
+          <span style="font-size: 12px">v2021.01.20</span>
         </td>
       </tr>
     </table>
@@ -55,7 +55,7 @@
                   v-model="filters['global']"
                   placeholder="Fritekst søk"
                   size="40"
-                  @keyup="searchUsingQuery()"
+                  @keyup="highlightMatches()"
                 />
               </span>
             </td>
@@ -185,6 +185,7 @@ const kolLand = { field: "Land", header: "Land" };
 const kolArrangor = { field: "Arrangor", header: "Arrangør" };
 const kolArrangertFor1 = { field: "ArrangertFor1", header: "Arrangert for" };
 const kolArrangertFor2 = { field: "ArrangertFor2", header: "Arrangert for 2" };
+const kolProsjekt = { field: "Prosjekt", header: "Prosjekt" };
 
 const allCols = [
   kolArkivNr,
@@ -201,14 +202,15 @@ const allCols = [
   kolArrangor,
   kolArrangertFor1,
   kolArrangertFor2,
+  kolProsjekt,
 ];
 const minCols = [
+  kolProsjekt,
   kolArkivNr,
   kolTittel1,
   kolKategori1,
   kolKomponist,
   kolArrangor,
-  kolKommentar,
 ];
 
 export default {
@@ -241,6 +243,7 @@ export default {
               { wch: 20 }, // arrangor
               { wch: 10 }, // arrangortFor1
               { wch: 10 }, // arrangortFor2
+              { wch: 10 }, // prosjekt
             ];
             XLSX.utils.book_append_sheet(wb, ws, "TJK-notearkiv-alle");
             XLSX.writeFile(wb, "TJK-notearkiv-alle.xlsx");
@@ -308,6 +311,7 @@ export default {
     });
     if (this.$route.query.search) {
       this.filters["global"] = this.$route.query.search;
+      setTimeout(() => this.highlightMatches(), 1000);
     }
   },
   methods: {
@@ -319,22 +323,15 @@ export default {
       this.visAvbrytKnapp = true;
       this.visDialog = true;
     },
-    searchUsingQuery() {
-      this.$router
-        .push({
-          path: "noter",
-          query: { search: this.filters["global"] },
-        })
-        .then(() => {
-          this.highlightMatches();
-        })
-        .catch((error) => {
-          if (error.name !== "NavigationDuplicated") {
-            throw error;
-          }
-        });
-    },
     highlightMatches() {
+      if (this.filters.global === undefined) {
+        this.filters["global"] = "";
+      }
+      if (this.filters["global"] === "") {
+        // bug når sida er lasta med search-param: inputfelt v-model kobles av. Nullstiller objekt for reset.
+        this.filters = {};
+        return;
+      }
       const searchWords = this.filters["global"].split(" ");
       const tabellen = document.querySelector(".p-datatable-tbody");
       const tds = tabellen.getElementsByTagName("TD");
