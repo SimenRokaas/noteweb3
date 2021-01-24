@@ -64,7 +64,7 @@ router.delete("/:id", auth.authMiddleware, (req, res) => {
 });
 
 router.get("/skanliste/:id", auth.authMiddleware, (req, res) => {
-  const arkivNr = req.params.id;
+  const arkivNr = req.params.id.padStart(4, "0");
   const hundrerMappeUrl = getHundrerMappeUrl(arkivNr);
 
   getHtmlContent(hundrerMappeUrl).then((html) => {
