@@ -14,7 +14,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2021.01.20</span>
+          <span style="font-size: 12px">v2021.01.24</span>
         </td>
       </tr>
     </table>
@@ -31,8 +31,7 @@
       :selection.sync="valgtNote"
       :sort-order="-1"
       :value="noter"
-      @row-select="onRowSelect"
-      :auto-layout="!justerbareKolonner"
+      auto-layout
       class="p-datatable-striped"
       csv-separator="|"
       current-page-report-template="Viser {first} til {last} av {totalRecords} noter"
@@ -55,7 +54,6 @@
                   v-model="filters['global']"
                   placeholder="Fritekst søk"
                   size="40"
-                  @keyup="highlightMatches()"
                 />
               </span>
             </td>
@@ -84,17 +82,13 @@
                   Kan skrive (DEV)
                 </label>
               </span>
-              <Checkbox
-                id="justerbareKolonner"
-                v-model="justerbareKolonner"
-                :binary="true"
-              />
+              <Checkbox id="visProsjekt" v-model="visProsjekt" :binary="true" />
               <label
-                for="justerbareKolonner"
+                for="visProsjekt"
                 class="p-checkbox-label"
                 style="font-size: 14px; margin-right: 4px"
               >
-                Justerbare kolonnebredder
+                Vis prosjekt
               </label>
               <Button
                 icon="pi pi-cog"
@@ -122,7 +116,7 @@
                 icon="pi pi-sign-out"
                 label="Logg ut"
                 @click="loggUt"
-                class="p-button-warning"
+                class="p-button-danger"
               ></Button>
             </td>
           </tr>
@@ -131,12 +125,34 @@
       <template #empty> Ingen treff. </template>
       <template #loading> Laster noter, vent litt... </template>
 
+      <Column :exportable="false">
+        <template #body="slotProps">
+          <Button
+            :icon="kanSkrive ? 'pi pi-pencil' : 'pi pi-search'"
+            class="p-button-success"
+            style="margin-right: 4px"
+            @click="onRowSelect(slotProps.data)"
+          />
+          <Button
+            icon="pi pi-print"
+            class="p-button-warning"
+            @click="visNoteskannDialog(slotProps.data)"
+          />
+        </template>
+      </Column>
       <Column
-        v-for="col of valgteKolonner"
+        v-if="visProsjekt"
+        key="Prosjekt"
+        field="Prosjekt"
+        header="Prosjekt"
+        sortable
+      />
+      <Column
+        v-for="col of valgteKolonner.filter((col) => col.field !== 'Prosjekt')"
         :key="col.field"
         :field="col.field"
         :header="col.header"
-        :sortable="true"
+        sortable
       />
     </DataTable>
 
@@ -161,6 +177,13 @@
       :visSlettKnapp="visSlettKnapp"
       @skjul-notedialog="skjulNoteDialog"
     />
+
+    <NoteskannLenkerDialog
+      :erSynlig="visNoteskannLenkerDialog"
+      :arkivNr="arkNrNaa"
+      :lenker="skannedeNoter"
+      @skjul-noteskannlenkerdialog="skjulNoteskannLenkerDialog"
+    />
   </div>
 </template>
 
@@ -169,6 +192,7 @@ import AuthService from "@/service/AuthService";
 import NoteService from "@/service/NoteService";
 import KolonnePicklist from "@/components/noter/KolonnePicklist";
 import NoteDialog from "@/components/noter/NoteDialog";
+import NoteskannLenkerDialog from "@/components/noter/NoteskannLenkerDialog";
 import XLSX from "xlsx";
 
 const kolArkivNr = { field: "ArkivNr", header: "Arkivnr" };
@@ -208,9 +232,9 @@ const minCols = [
   kolProsjekt,
   kolArkivNr,
   kolTittel1,
-  kolKategori1,
   kolKomponist,
   kolArrangor,
+  kolKommentar,
 ];
 
 export default {
@@ -272,7 +296,7 @@ export default {
       ],
       erDev: process.env.NODE_ENV === "development",
       filters: {},
-      justerbareKolonner: false,
+      visProsjekt: true,
       valgteKolonner: minCols,
       kanLese: false,
       kanSkrive: false,
@@ -287,11 +311,14 @@ export default {
       visDialog: false,
       visKolonneValgDialog: false,
       visSlettKnapp: true,
+      skannedeNoter: [],
+      visNoteskannLenkerDialog: false,
     };
   },
   components: {
     KolonnePicklist,
     NoteDialog,
+    NoteskannLenkerDialog,
   },
   mounted() {
     this.title = process.env.VUE_APP_TITLE;
@@ -311,45 +338,16 @@ export default {
     });
     if (this.$route.query.search) {
       this.filters["global"] = this.$route.query.search;
-      setTimeout(() => this.highlightMatches(), 1000);
     }
   },
   methods: {
-    onRowSelect(event) {
-      this.arkNrNaa = event.data.ArkivNr;
+    onRowSelect(data) {
+      this.arkNrNaa = data.ArkivNr;
       this.mode = "ENDRE";
-      this.dialogNote = { ...event.data };
+      this.dialogNote = { ...data };
       this.visSlettKnapp = true;
       this.visAvbrytKnapp = true;
       this.visDialog = true;
-    },
-    highlightMatches() {
-      if (this.filters.global === undefined) {
-        this.filters["global"] = "";
-      }
-      if (this.filters["global"] === "") {
-        // bug når sida er lasta med search-param: inputfelt v-model kobles av. Nullstiller objekt for reset.
-        this.filters = {};
-        return;
-      }
-      const searchWords = this.filters["global"].split(" ");
-      const tabellen = document.querySelector(".p-datatable-tbody");
-      const tds = tabellen.getElementsByTagName("TD");
-      tds.forEach((td) => {
-        td.innerHTML = td.innerHTML.replace(/<mark>(.*)<\/mark>/, "$1");
-        searchWords.forEach((word) => {
-          if (
-            word.length > 0 &&
-            td.textContent.toLowerCase().indexOf(word.toLowerCase()) !== -1
-          ) {
-            const wordEscaped = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-            td.innerHTML = td.innerHTML.replace(
-              new RegExp(wordEscaped, "i"),
-              "<mark>$&</mark>"
-            );
-          }
-        });
-      });
     },
     leggTilNote() {
       this.mode = "NY";
@@ -380,6 +378,17 @@ export default {
         this.kanSkrive = false;
         this.kanLese = false;
       });
+    },
+    visNoteskannDialog(data) {
+      this.arkNrNaa = data.ArkivNr;
+      NoteService.getSkanListe(data.ArkivNr)
+        .then((res) => (this.skannedeNoter = res))
+        .catch((error) => this.handleError(error));
+      this.visNoteskannLenkerDialog = true;
+    },
+    skjulNoteskannLenkerDialog() {
+      this.visNoteskannLenkerDialog = false;
+      this.skannedeNoter = [];
     },
   },
 };

@@ -34,11 +34,6 @@
       <template #footer>
         <div v-if="kanSkrive">
           <Button
-            label="Noter"
-            icon="pi pi-file-pdf"
-            @click="visNoteskannDialog"
-          />
-          <Button
             v-if="visAvbrytKnapp"
             label="Avbryt"
             icon="pi pi-times"
@@ -61,29 +56,16 @@
           />
         </div>
         <div v-else>
-          <span v-show="skannedeNoter.length > 0">
-            <Button
-              label="Noter"
-              icon="pi pi-file-pdf"
-              @click="visNoteskannDialog"
-            />
-          </span>
           <Button
-            label="OK"
+            label="Lukk"
             icon="pi pi-check"
             @click="skjulNoteDialog"
             class="p-button-success"
+            autofocus
           />
         </div>
       </template>
     </Dialog>
-
-    <NoteskannLenkerDialog
-      :erSynlig="visNoteskannLenkerDialog"
-      :arkivNr="arkNrNaa"
-      :lenker="skannedeNoter"
-      @skjul-noteskannlenkerdialog="skjulNoteskannLenkerDialog"
-    />
 
     <Dialog
       :visible.sync="visBekreftSlett"
@@ -135,21 +117,12 @@ export default {
     "visAvbrytKnapp",
     "visSlettKnapp",
   ],
-  watch: {
-    arkNrNaa(newValue) {
-      NoteService.getSkanListe(newValue)
-        .then((res) => (this.skannedeNoter = res))
-        .catch((error) => this.handleError(error));
-    },
-  },
   data() {
     return {
       autocompleteSuggestions: null,
       visBekreftSlett: false,
       arkivNrIToast: "",
       autolayout: true,
-      skannedeNoter: [],
-      visNoteskannLenkerDialog: false,
     };
   },
   methods: {
@@ -241,12 +214,6 @@ export default {
     },
     skjulNoteDialog() {
       this.$emit("skjul-notedialog");
-    },
-    visNoteskannDialog() {
-      this.visNoteskannLenkerDialog = true;
-    },
-    skjulNoteskannLenkerDialog() {
-      this.visNoteskannLenkerDialog = false;
     },
   },
 };

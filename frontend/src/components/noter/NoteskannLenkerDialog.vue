@@ -8,6 +8,11 @@
       modal
       :closable="false"
     >
+      <i
+        v-if="isEmpty(lenker)"
+        class="pi pi-spin pi-spinner"
+        style="font-size: 3rem"
+      ></i>
       <div v-if="typeof lenker === 'string'">
         {{ lenker }}
       </div>
@@ -20,10 +25,11 @@
       </div>
       <p />
       <Button
-        label="OK"
+        label="Lukk"
         icon="pi pi-check"
         @click="skjulNoteskannLenkerDialog"
         class="p-button-success"
+        autofocus
       />
     </Dialog>
   </div>
@@ -59,6 +65,9 @@ export default {
         detail: error,
         life: 3000,
       });
+    },
+    isEmpty(obj) {
+      return Object.keys(obj).length === 0;
     },
   },
 };

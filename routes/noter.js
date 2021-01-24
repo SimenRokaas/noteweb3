@@ -109,7 +109,7 @@ function getHundrerMappeUrl(arkivNr) {
 
 function getHtmlContent(url) {
   return axios
-    .get(url)
+    .get(url, { headers: { "User-agent": "tjk-noteweb" } })
     .then((res) => res.data)
     .catch((error) => console.error(error));
 }
