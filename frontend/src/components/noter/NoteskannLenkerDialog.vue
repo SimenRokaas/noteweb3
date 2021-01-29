@@ -8,6 +8,11 @@
       modal
       :closable="false"
     >
+      <ProgressBar
+        v-show="visProgressBar"
+        mode="indeterminate"
+        style="margin-bottom: 8px"
+      />
       <i
         v-if="isEmpty(lenker)"
         class="pi pi-spin pi-spinner"
@@ -31,16 +36,27 @@
         class="p-button-success"
         autofocus
       />
+      <ProgressBar
+        v-show="visProgressBar"
+        mode="indeterminate"
+        style="margin-top: 8px"
+      />
     </Dialog>
   </div>
 </template>
 
 <script>
 import download from "downloadjs";
+import NoteService from "@/service/NoteService";
 
 export default {
   name: "NoteskannLenker",
   props: ["erSynlig", "arkivNr", "lenker"],
+  data() {
+    return {
+      visProgressBar: false,
+    };
+  },
   methods: {
     getHeader() {
       return "Skannede noter for arkivnr " + this.arkivNr;
@@ -48,15 +64,18 @@ export default {
     skjulNoteskannLenkerDialog() {
       this.$emit("skjul-noteskannlenkerdialog");
     },
-    getNote(link) {
-      console.log("Downloading " + link.href + " ...");
-      const x = new XMLHttpRequest();
-      x.open("GET", link.href, true);
-      x.responseType = "blob";
-      x.onload = function (e) {
-        download(e.target.response, link.text, "application/pdf");
-      };
-      x.send();
+    getNote(linkObj) {
+      this.visProgressBar = true;
+      NoteService.getNote(linkObj)
+        .then((response) => {
+          const contentType = response.headers["content-type"];
+          download(response.data, linkObj.text, contentType);
+          this.visProgressBar = false;
+        })
+        .catch((error) => {
+          console.error(error);
+          this.visProgressBar = false;
+        });
     },
     handleError(error) {
       this.$toast.add({

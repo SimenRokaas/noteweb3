@@ -30,4 +30,12 @@ export default class NoteService {
       .get("/noter/skanliste/" + arkivnr)
       .then((res) => res.data);
   }
+
+  static getNote(linkObj) {
+    return Api()
+      .post("/noter/skannetnote/", linkObj, {
+        responseType: "blob",
+      })
+      .then((res) => res);
+  }
 }

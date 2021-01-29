@@ -19,6 +19,7 @@ import PickList from "primevue/picklist";
 import SplitButton from "primevue/splitbutton";
 import Toast from "primevue/toast";
 import ToastService from "primevue/toastservice";
+import ProgressBar from "primevue/progressbar";
 
 Vue.use(ToastService);
 
@@ -37,6 +38,7 @@ Vue.component("PickList", PickList);
 Vue.component("Password", Password);
 Vue.component("SplitButton", SplitButton);
 Vue.component("Toast", Toast);
+Vue.component("ProgressBar", ProgressBar);
 
 import "primevue/resources/themes/nova/theme.css";
 import "primevue/resources/primevue.min.css";

@@ -95,6 +95,20 @@ router.get("/skanliste/:id", auth.authMiddleware, (req, res) => {
   });
 });
 
+router.post("/skannetnote/", auth.authMiddleware, (req, res) => {
+  const note = req.body;
+  console.log("Laster ned " + note.href);
+  axios
+    .get(note.href, {
+      responseType: "arraybuffer",
+    })
+    .then((resp) => {
+      res.contentType("application/pdf");
+      res.send(new Buffer.from(resp.data, "binary"));
+    })
+    .catch((error) => console.error(error));
+});
+
 function getHundrerMappeUrl(arkivNr) {
   // genererer linker fra arkivnr
   // arkivnr 1-100 har mappe 99 Arkivnr 1-100
@@ -109,7 +123,7 @@ function getHundrerMappeUrl(arkivNr) {
 
 function getHtmlContent(url) {
   return axios
-    .get(url, { headers: { "User-agent": "tjk-noteweb" } })
+    .get(url)
     .then((res) => res.data)
     .catch((error) => console.error(error));
 }
