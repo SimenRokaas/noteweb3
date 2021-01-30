@@ -15,7 +15,7 @@ export default new VueRouter({
       component: Login,
     },
     {
-      path: "/noter",
+      path: "/noter/",
       name: "Noter",
       component: Noter,
     },

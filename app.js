@@ -84,7 +84,7 @@ passport.deserializeUser((id, done) => {
 
 // routes for the app
 app.use("/auth", require("./routes/auth").router);
-app.use("/noter", require("./routes/noter"));
+app.use("/arkiv", require("./routes/arkiv"));
 
 console.log("Env: " + process.env.NODE_ENV);
 if (process.env.NODE_ENV !== "development") {

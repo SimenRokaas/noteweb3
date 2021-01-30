@@ -3,37 +3,37 @@ import Api from "@/service/Api";
 export default class NoteService {
   static fetchNoter() {
     return Api()
-      .get("/noter/list")
+      .get("/arkiv/list")
       .then((res) => res.data);
   }
 
   static update(note) {
     return Api()
-      .put("/noter/" + note.ArkivNr, note)
+      .put("/arkiv/" + note.ArkivNr, note)
       .then((res) => res);
   }
 
   static create(note) {
     return Api()
-      .post("/noter", note)
+      .post("/arkiv", note)
       .then((res) => res);
   }
 
   static delete(note) {
     return Api()
-      .delete("/noter/" + note.ArkivNr)
+      .delete("/arkiv/" + note.ArkivNr)
       .then((res) => res);
   }
 
   static getSkanListe(arkivnr) {
     return Api()
-      .get("/noter/skanliste/" + arkivnr)
+      .get("/arkiv/skanliste/" + arkivnr)
       .then((res) => res.data);
   }
 
   static getNote(linkObj) {
     return Api()
-      .post("/noter/skannetnote/", linkObj, {
+      .post("/arkiv/skannetnote/", linkObj, {
         responseType: "blob",
       })
       .then((res) => res);

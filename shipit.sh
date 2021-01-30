@@ -35,12 +35,12 @@ echo "==========================================================================
 
 ssh -p 7822 tjkno@nl1-ss12.a2hosting.com <<'ENDSSH'
   # commands to run on remote host
-  # Lager backup av gjeldende versjon
+  echo "tjk.no server: Lager backup av gjeldende versjon..."
   tar -zcvf noter-backup-$(date +%Y-%m-%d_%H%M).tgz noter/*.js noter/frontend noter/routes
-  # Fjern gjeldende versjon. NB! La node_modules ligge!
+  echo "tjk.no server: Fjerner gjeldende versjon. NB! Lar node_modules ligge!"
   cd noter
   rm -r *.js *.json frontend public routes tmp
-  # Pakker ut fra opplastet ny versjon
+  echo "tjk.no server: Pakker ut fra opplastet ny versjon..."
   tar -zxvf ../tmp/server.tgz
   tar -zxvf ../tmp/frontend-dist.tgz
 ENDSSH
