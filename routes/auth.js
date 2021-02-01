@@ -19,7 +19,6 @@ router.post("/login", (req, res, next) => {
 
 router.get("/logout", (req, res) => {
   req.logout();
-  console.log("logged out");
   return res.send();
 });
 
@@ -39,7 +38,7 @@ conn.query("select * from noter_brukere", function (error, result) {
   users = result;
 });
 
-router.get("/user", authMiddleware, (req, res) => {
+router.get("/user", (req, res) => {
   let user = users.find((user) => {
     return user.id === req.session.passport.user;
   });

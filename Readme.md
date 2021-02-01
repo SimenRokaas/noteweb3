@@ -2,6 +2,13 @@
 ### Med PrimeVue + Node + Express +MySql
 ![alt text](vue-node-express-mysql-architecture.png "Architecture")
 
+### Database
+
+Notearkivet ligger i tabellen `noter` i mysql-databasen `tjkno_noter` på tjk.no.
+
+Påloggingsdetaljer hentes fra miljøvariabler, se `database.js`. På server hentes
+miljøvariablene fra `.env`på applikasjonskatalogen.
+
 ### Backend
 Node + Express + Cors + MySql + Passport
 
@@ -23,7 +30,7 @@ Backend kjøres lokalt med NODE_ENV=production slik at frontend serves fra dist-
 #### Den enkle måten
     ./shipit.sh
     
-Skriptet vil spørre om ssh-passord to ganger.
+Skriptet bruker ssh user key. Public key er importert på server (tjk.no).
 
 #### Den manuelle måten
 

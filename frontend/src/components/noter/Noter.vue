@@ -14,7 +14,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2021.01.29</span>
+          <span style="font-size: 12px">v2021.02.01</span>
         </td>
       </tr>
     </table>
@@ -54,6 +54,7 @@
                   v-model="filters['global']"
                   placeholder="Fritekst søk"
                   size="40"
+                  @keyup="highlightMatches()"
                 />
               </span>
             </td>
@@ -322,7 +323,14 @@ export default {
   },
   mounted() {
     this.title = process.env.VUE_APP_TITLE;
+    if (this.$route.query.search) {
+      sessionStorage.search = this.$route.query.search;
+    }
     AuthService.user().then((user) => {
+      if (user === undefined) {
+        this.$router.push({ name: "Login" });
+        return;
+      }
       if (user.rolle === "les") {
         this.kanLese = true;
         this.kanSkrive = false;
@@ -336,8 +344,8 @@ export default {
       this.noter = data;
       this.loading = false;
     });
-    if (this.$route.query.search) {
-      this.filters["global"] = this.$route.query.search;
+    if (sessionStorage.search) {
+      this.filters["global"] = sessionStorage.search;
     }
   },
   methods: {
@@ -348,6 +356,35 @@ export default {
       this.visSlettKnapp = true;
       this.visAvbrytKnapp = true;
       this.visDialog = true;
+    },
+    highlightMatches() {
+      if (this.filters.global === undefined) {
+        this.filters["global"] = "";
+      }
+      sessionStorage.search = this.filters["global"];
+      if (this.filters["global"] === "") {
+        // bug når sida er lasta med search-param: inputfelt v-model kobles av. Nullstiller objekt for reset.
+        this.filters = {};
+        return;
+      }
+      const searchWords = this.filters["global"].split(" ");
+      const tabellen = document.querySelector(".p-datatable-tbody");
+      const tds = tabellen.getElementsByTagName("TD");
+      tds.forEach((td) => {
+        td.innerHTML = td.innerHTML.replace(/<mark>(.*)<\/mark>/, "$1");
+        searchWords.forEach((word) => {
+          if (
+            word.length > 0 &&
+            td.textContent.toLowerCase().indexOf(word.toLowerCase()) !== -1
+          ) {
+            const wordEscaped = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+            td.innerHTML = td.innerHTML.replace(
+              new RegExp(wordEscaped, "i"),
+              "<mark>$&</mark>"
+            );
+          }
+        });
+      });
     },
     leggTilNote() {
       this.mode = "NY";
@@ -374,6 +411,7 @@ export default {
       this.valgteKolonner = kol;
     },
     loggUt() {
+      sessionStorage.removeItem("search");
       AuthService.logout().then(() => {
         this.kanSkrive = false;
         this.kanLese = false;
