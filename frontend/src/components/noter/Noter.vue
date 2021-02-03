@@ -358,6 +358,7 @@ export default {
       this.visDialog = true;
     },
     highlightMatches() {
+      let doReplace = true;
       if (this.filters.global === undefined) {
         this.filters["global"] = "";
       }
@@ -365,13 +366,15 @@ export default {
       if (this.filters["global"] === "") {
         // bug når sida er lasta med search-param: inputfelt v-model kobles av. Nullstiller objekt for reset.
         this.filters = {};
-        return;
+        doReplace = false;
       }
-      const searchWords = this.filters["global"].split(" ");
+      const searchWords = doReplace ? this.filters["global"].split(" ") : [];
       const tabellen = document.querySelector(".p-datatable-tbody");
       const tds = tabellen.getElementsByTagName("TD");
       tds.forEach((td) => {
-        td.innerHTML = td.innerHTML.replace(/<mark>(.*)<\/mark>/, "$1");
+        if (td.innerHTML.includes("<mark>")) {
+          td.innerHTML = td.innerHTML.replace(/<mark>(.*)<\/mark>/, "$1");
+        }
         searchWords.forEach((word) => {
           if (
             word.length > 0 &&
