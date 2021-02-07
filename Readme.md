@@ -46,12 +46,6 @@ Backend kjøres (på server) med NODE_ENV=production slik at frontend serves fra
 
 Se `shipit.sh`for detaljer om overføring til server.
 
-## Oppdatere npm-avhengigheter
-    npx npm-check-updates -u
-    npm install
-    
-Se https://www.carlrippon.com/upgrading-npm-dependencies/
-
 ## Listing og nedlasting av noter
 
 Skannede noter ligger på https://tjk.no/TJK-medlem/02 Noteskann/ .
@@ -93,3 +87,9 @@ oppgitt passord med de to som ligger i DB.
 Autentiseringsløsningen er inspirert av
 https://blog.jscrambler.com/vue-js-authentication-system-with-node-js-backend/
 men er forenklet siden vi kun har to felles-brukere.
+
+## Oppdatere npm-avhengigheter
+    npx npm-check-updates -u
+    npm install
+
+Se https://www.carlrippon.com/upgrading-npm-dependencies/
