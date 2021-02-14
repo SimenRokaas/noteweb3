@@ -1,13 +1,10 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 import Login from "@/components/Login";
 import Noter from "@/components/noter/Noter";
 
-Vue.use(VueRouter);
-
-export default new VueRouter({
-  mode: "history",
+const router = createRouter({
+  history: createWebHistory(),
   routes: [
     {
       path: "/",
@@ -21,3 +18,4 @@ export default new VueRouter({
     },
   ],
 });
+export default router;
