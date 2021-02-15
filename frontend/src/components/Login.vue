@@ -48,6 +48,13 @@ export default {
       passordFeil: false,
     };
   },
+  mounted() {
+    AuthService.user().then((user) => {
+      if (user !== undefined) {
+        this.$router.push({ name: "Noter" });
+      }
+    });
+  },
   methods: {
     login(e) {
       e.preventDefault();

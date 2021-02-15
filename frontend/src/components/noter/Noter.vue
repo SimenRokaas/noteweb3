@@ -14,7 +14,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2021.02.07</span>
+          <span style="font-size: 12px">v2021.02.15</span>
         </td>
       </tr>
     </table>
@@ -56,11 +56,30 @@
                   size="40"
                   @keyup="highlightMatches()"
                 />
+                <Checkbox
+                  id="alleKolonner"
+                  v-model="visAlleKolonner"
+                  :binary="true"
+                  style="margin-bottom: 5px; margin-left: 4px"
+                  v-on:change="onVisAlleKolonner()"
+                />
+                <label
+                  for="alleKolonner"
+                  class="p-checkbox-label"
+                  style="font-size: 14px; margin-right: 4px"
+                >
+                  Vis/søk i alle kolonner
+                </label>
               </span>
             </td>
             <td style="float: right">
               <span v-if="erDev">
-                <Checkbox id="toggleKanLese" v-model="kanLese" :binary="true" />
+                <Checkbox
+                  id="toggleKanLese"
+                  v-model="kanLese"
+                  :binary="true"
+                  style="margin-bottom: 5px; margin-right: 4px"
+                />
                 <label
                   for="toggleKanLese"
                   class="p-checkbox-label"
@@ -74,6 +93,7 @@
                   id="toggleKanSkrive"
                   v-model="kanSkrive"
                   :binary="true"
+                  style="margin-bottom: 5px; margin-right: 4px"
                 />
                 <label
                   for="toggleKanSkrive"
@@ -83,7 +103,12 @@
                   Kan skrive (DEV)
                 </label>
               </span>
-              <Checkbox id="visProsjekt" v-model="visProsjekt" :binary="true" />
+              <Checkbox
+                id="visProsjekt"
+                v-model="visProsjekt"
+                :binary="true"
+                style="margin-bottom: 5px; margin-right: 4px"
+              />
               <label
                 for="visProsjekt"
                 class="p-checkbox-label"
@@ -299,6 +324,8 @@ export default {
       filters: {},
       visProsjekt: true,
       valgteKolonner: minCols,
+      valgteKolonnerBackup: minCols,
+      visAlleKolonner: false,
       kanLese: false,
       kanSkrive: false,
       loading: true,
@@ -430,6 +457,23 @@ export default {
     skjulNoteskannLenkerDialog() {
       this.visNoteskannLenkerDialog = false;
       this.skannedeNoter = [];
+    },
+    onVisAlleKolonner() {
+      console.log("Flagg: " + this.visAlleKolonner);
+      if (this.visAlleKolonner) {
+        this.valgteKolonnerBackup = this.valgteKolonner;
+        this.valgteKolonner = allCols;
+      } else {
+        if (this.valgteKolonnerBackup) {
+          this.valgteKolonner = this.valgteKolonnerBackup;
+        } else {
+          this.valgteKolonner = minCols;
+        }
+      }
+      // endring av 'valgteKolonner' vil rendre tabellen på nytt, da må vi også kjøre highlightMatches på nytt
+      setTimeout(() => {
+        this.highlightMatches();
+      }, 500);
     },
   },
 };
