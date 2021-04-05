@@ -1,24 +1,5 @@
 <template>
   <div>
-    <table>
-      <tr>
-        <td style="vertical-align: top">
-          <!--suppress HtmlUnknownTarget -->
-          <img
-            src="Tønsberg-Janitsjarkorps-logo-600px-300x300.jpg"
-            alt="TJK logo"
-            width="50"
-          />
-        </td>
-        <td style="vertical-align: middle">
-          <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
-        </td>
-        <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2021.02.15</span>
-        </td>
-      </tr>
-    </table>
-
     <DataTable
       :filters="filters"
       :loading="loading"
@@ -174,7 +155,7 @@
         sortable
       />
       <Column
-        v-for="col of valgteKolonner.filter((col) => col.field !== 'Prosjekt')"
+        v-for="col of valgteKolonner.filter(() => col.field !== 'Prosjekt')"
         :key="col.field"
         :field="col.field"
         :header="col.header"

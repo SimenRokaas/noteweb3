@@ -1,13 +1,18 @@
 <template>
-  <div id="app">
-    <Toast position="top-left" />
+  <div id="app" style="margin-top: 0">
+    <Topp />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import Topp from "@/components/Topp";
+
 export default {
   name: "TjkNoter",
+  components: {
+    Topp,
+  },
 };
 </script>
 
