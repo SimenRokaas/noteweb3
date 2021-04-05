@@ -155,7 +155,7 @@
         sortable
       />
       <Column
-        v-for="col of valgteKolonner.filter(() => col.field !== 'Prosjekt')"
+        v-for="col of valgteKolonner.filter((clm) => clm.field !== 'Prosjekt')"
         :key="col.field"
         :field="col.field"
         :header="col.header"
