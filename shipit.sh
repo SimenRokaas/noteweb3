@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo "Har du stoppet node-app på server? https://nl1-ss12.a2hosting.com:2083/cpsess6359040869/frontend/paper_lantern/lveversion/nodejs-selector.html.tt#/"
+echo "Har du stoppet node-app på server?"
 select yn in "ja" "nei"; do
     case $yn in
         ja ) echo "Fint, da kjører vi på!"; break;;
@@ -8,7 +8,7 @@ select yn in "ja" "nei"; do
 done
 
 echo "================================================================================================================="
-echo " Bygger frontend for production (NODE_ENV=production) slik at API-kall går til tjk.no... "
+echo " Bygger frontend for production (NODE_ENV=production) slik at API-kall går til notearkiv.tjk.no... "
 echo "================================================================================================================="
 
 cd frontend
@@ -27,18 +27,19 @@ echo "==========================================================================
 echo "Laster opp til server..."
 echo "================================================================================================================="
 
-scp -P 7822 server.tgz frontend-dist.tgz tjkno@nl1-ss12.a2hosting.com:/home/tjkno/tmp
+#scp -P 7822 server.tgz frontend-dist.tgz tjkno@nl1-ss12.a2hosting.com:/home/tjkno/tmp
+scp -P 7822 server.tgz frontend-dist.tgz tjkno@190.92.134.172:/home/tjkno/tmp
 
 echo "================================================================================================================="
 echo "Tar backup og Pakker ut på server..."
 echo "================================================================================================================="
 
-ssh -p 7822 tjkno@nl1-ss12.a2hosting.com <<'ENDSSH'
+ssh -p 7822 tjkno@190.92.134.172 <<'ENDSSH'
   # commands to run on remote host
   echo "tjk.no server: Lager backup av gjeldende versjon..."
-  tar -zcvf noter-backup-$(date +%Y-%m-%d_%H%M).tgz noter/*.js noter/frontend noter/routes
+  tar -zcvf noter-backup-$(date +%Y-%m-%d_%H%M).tgz notearkiv-server/*.js notearkiv-server/frontend notearkiv-server/routes
   echo "tjk.no server: Fjerner gjeldende versjon. NB! Lar node_modules ligge!"
-  cd noter
+  cd notearkiv-server
   rm -r *.js *.json frontend public routes tmp
   echo "tjk.no server: Pakker ut fra opplastet ny versjon..."
   tar -zxvf ../tmp/server.tgz
