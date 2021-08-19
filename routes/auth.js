@@ -40,7 +40,7 @@ conn.query("select * from noter_brukere", function (error, result) {
 
 router.get("/user", (req, res) => {
   let user = users.find((user) => {
-    return user.id === req.session.passport.user;
+    return req.user && user.id === req.user.id;
   });
   res.send({ user: user });
 });
