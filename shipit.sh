@@ -40,7 +40,7 @@ ssh -p 7822 tjkno@190.92.134.172 <<'ENDSSH'
   tar -zcvf noter-backup-$(date +%Y-%m-%d_%H%M).tgz notearkiv-server/*.js notearkiv-server/frontend notearkiv-server/routes
   echo "tjk.no server: Fjerner gjeldende versjon. NB! Lar node_modules ligge!"
   cd notearkiv-server
-  rm -r *.js *.json frontend public routes tmp
+  rm -r *.js *.json frontend routes
   echo "tjk.no server: Pakker ut fra opplastet ny versjon..."
   tar -zxvf ../tmp/server.tgz
   tar -zxvf ../tmp/frontend-dist.tgz

@@ -6,7 +6,7 @@ const router = express.Router();
 const pool = require("../database");
 
 const axios = require("axios");
-const $ = require("cheerio");
+const cheerio = require("cheerio");
 const NOTESKANN_BASE = "https://tjk.no/TJK-medlem/02 Noteskann/";
 
 const auth = require("./auth");
@@ -68,7 +68,8 @@ router.get("/skanliste/:id", auth.authMiddleware, (req, res) => {
   const hundrerMappeUrl = getHundrerMappeUrl(arkivNr);
 
   getHtmlContent(hundrerMappeUrl).then((html) => {
-    const linkObjects = $("a", html);
+    const $ = cheerio.load(html.toString());
+    const linkObjects = $("a");
     let funnet = false;
     linkObjects.each((i, link) => {
       // finn link som matcher arkivnr
@@ -77,12 +78,13 @@ router.get("/skanliste/:id", auth.authMiddleware, (req, res) => {
         funnet = true;
         const noteUrl = hundrerMappeUrl + "/" + href;
         getHtmlContent(noteUrl).then((html) => {
-          const partObjects = $("a", html);
+          const $$ = cheerio.load(html.toString());
+          const partObjects = $$("a");
           const links = [];
           partObjects.each((i, part) => {
             links.push({
-              text: $(part).text().trim(),
-              href: noteUrl + $(part).attr("href"),
+              text: $$(part).text().trim(),
+              href: noteUrl + $$(part).attr("href"),
             });
           });
           res.send(links);

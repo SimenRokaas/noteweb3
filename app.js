@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -99,8 +100,13 @@ const port = process.env.port || 57462;
 app.set("port", port); // set express to use this port
 app.listen(port, () => {
   if (typeof PhusionPassenger !== "undefined") {
-    console.log(`TJK Notearkiv server kjører i Passenger.`);
+    console.log("TJK Notearkiv server kjører i Passenger.");
   } else {
     console.log(`TJK Notearkiv server kjører på port ${port}.`);
   }
+});
+process.on("SIGTERM", () => {
+  app.close(() => {
+    console.log("TJK Notearkiv server er avsluttet.");
+  });
 });
