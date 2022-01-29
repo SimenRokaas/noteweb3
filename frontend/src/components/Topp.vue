@@ -15,7 +15,7 @@
           <span style="font-size: 18px; font-weight: bold">{{ tittel }}</span>
         </td>
         <td style="vertical-align: middle">
-          <span style="font-size: 12px">v2021.04.05</span>
+          <span style="font-size: 12px">v2022.01.29</span>
         </td>
         <td>
           <Varsel style="margin-left: 20px" />

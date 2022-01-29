@@ -21,8 +21,10 @@ router.get("/list", auth.authMiddleware, (req, res) => {
 });
 
 router.put("/:id", auth.authMiddleware, (req, res) => {
-  var arkivNr = req.params.id;
-  console.log("Oppdaterer arkivnr " + arkivNr);
+  const arkivNr = req.params.id;
+  console.log(
+    "Oppdaterer arkivnr " + arkivNr + " med felt: " + JSON.stringify(req.body)
+  );
   pool.query(
     "update noter set ? where arkivNr = ?",
     [record(req), arkivNr],
@@ -135,7 +137,7 @@ function record(req) {
     arkivNr: blankIfNull(req.body.ArkivNr),
     tittel1: blankIfNull(req.body.Tittel1),
     tittel2: blankIfNull(req.body.Tittel2),
-    soloInstrument: blankIfNull(req.body.SoloInstrument),
+    soloInstrument: blankIfNull(req.body.Soloinstrument),
     durata: blankIfNull(req.body.Durata),
     kategori1: blankIfNull(req.body.Kategori1),
     kategori2: blankIfNull(req.body.Kategori2),
