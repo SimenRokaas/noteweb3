@@ -98,6 +98,13 @@
                 Vis prosjekt
               </label>
               <Button
+                icon="pi pi-arrow-circle-down"
+                label="Vis nedlastinger"
+                @click="$router.push({ name: 'Nedlastinger' })"
+                style="margin-right: 4px"
+                class="p-button-warning"
+              />
+              <Button
                 icon="pi pi-cog"
                 label="Velg kolonner"
                 @click="visKolonneValgDialog = true"
