@@ -3,6 +3,10 @@
   <router-link to="Noter">Tilbake</router-link>
 </template>
 
-<script></script>
+<script>
+export default {
+  name: "Nedlastinger",
+};
+</script>
 
 <style></style>

@@ -1,14 +1,11 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 import Login from "@/components/Login";
 import Noter from "@/components/noter/Noter";
 import Nedlastinger from "@/components/noter/Nedlastinger";
 
-Vue.use(VueRouter);
-
-export default new VueRouter({
-  mode: "history",
+export default createRouter({
+  history: createWebHashHistory(),
   routes: [
     {
       path: "/",

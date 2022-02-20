@@ -14,8 +14,8 @@
           listStyle="height:342px"
           dataKey="field"
         >
-          <template #sourceHeader> Tilgjengelig </template>
-          <template #targetHeader> Valgt </template>
+          <template #sourceheader> Tilgjengelig </template>
+          <template #targetheader> Valgt </template>
           <template #item="slotProps">
             <div>
               <div>{{ slotProps.item.header }}</div>

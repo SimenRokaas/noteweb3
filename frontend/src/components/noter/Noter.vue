@@ -32,7 +32,7 @@
               <span class="p-input-icon-left">
                 <i class="pi pi-search"></i>
                 <InputText
-                  v-model="filters['global']"
+                  v-model="filters['global'].value"
                   placeholder="Fritekst søk"
                   size="40"
                   @keyup="highlightMatches()"
@@ -169,7 +169,6 @@
         sortable
       />
     </DataTable>
-
     <KolonnePicklist
       :erSynlig="visKolonneValgDialog"
       :alleKolonner="allColumns"
@@ -208,6 +207,7 @@ import KolonnePicklist from "@/components/noter/KolonnePicklist";
 import NoteDialog from "@/components/noter/NoteDialog";
 import NoteskannLenkerDialog from "@/components/noter/NoteskannLenkerDialog";
 import XLSX from "xlsx";
+import { FilterMatchMode } from "primevue/api";
 
 const kolArkivNr = { field: "ArkivNr", header: "Arkivnr" };
 const kolTittel1 = { field: "Tittel1", header: "Tittel" };
@@ -309,7 +309,7 @@ export default {
         },
       ],
       erDev: process.env.NODE_ENV === "development",
-      filters: {},
+      filters: null,
       visProsjekt: true,
       valgteKolonner: minCols,
       valgteKolonnerBackup: minCols,
@@ -335,6 +335,9 @@ export default {
     KolonnePicklist,
     NoteDialog,
     NoteskannLenkerDialog,
+  },
+  created() {
+    this.initFilters();
   },
   mounted() {
     this.title = process.env.VUE_APP_TITLE;
@@ -364,6 +367,11 @@ export default {
     }
   },
   methods: {
+    initFilters() {
+      this.filters = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      };
+    },
     onRowSelect(data) {
       this.arkNrNaa = data.ArkivNr;
       this.mode = "ENDRE";
@@ -374,16 +382,16 @@ export default {
     },
     highlightMatches() {
       let doReplace = true;
-      if (this.filters.global === undefined) {
-        this.filters["global"] = "";
+      if (this.filters.global.value === undefined) {
+        this.initFilters();
       }
-      sessionStorage.search = this.filters["global"];
-      if (this.filters["global"] === "") {
+      sessionStorage.search = this.filters.global.value;
+      if (this.filters.global.value === "") {
         // bug når sida er lasta med search-param: inputfelt v-model kobles av. Nullstiller objekt for reset.
-        this.filters = {};
+        this.initFilters();
         doReplace = false;
       }
-      const searchWords = doReplace ? this.filters["global"].split(" ") : [];
+      const searchWords = doReplace ? this.filters.global.value.split(" ") : [];
       const tabellen = document.querySelector(".p-datatable-tbody");
       const tds = tabellen.getElementsByTagName("TD");
       tds.forEach((td) => {

@@ -1,10 +1,11 @@
-import Vue from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 
 import axios from "axios";
 import VueAxios from "vue-axios";
 
+import PrimeVue from "primevue/config";
 import AutoComplete from "primevue/autocomplete";
 import Button from "primevue/button";
 import Checkbox from "primevue/checkbox";
@@ -21,34 +22,31 @@ import Toast from "primevue/toast";
 import ToastService from "primevue/toastservice";
 import ProgressBar from "primevue/progressbar";
 
-Vue.use(ToastService);
-
-Vue.use(VueAxios, axios);
-
-Vue.component("AutoComplete", AutoComplete);
-Vue.component("Button", Button);
-Vue.component("Checkbox", Checkbox);
-Vue.component("Column", Column);
-Vue.component("DataTable", DataTable);
-Vue.component("Dialog", Dialog);
-Vue.component("InputText", InputText);
-Vue.component("Message", Message);
-Vue.component("MultiSelect", MultiSelect);
-Vue.component("PickList", PickList);
-Vue.component("Password", Password);
-Vue.component("SplitButton", SplitButton);
-Vue.component("Toast", Toast);
-Vue.component("ProgressBar", ProgressBar);
-
 import "primevue/resources/themes/nova/theme.css";
 import "primevue/resources/primevue.min.css";
+
 import "primeicons/primeicons.css";
 
-import VueCookies from "vue-cookies";
-Vue.use(VueCookies);
-Vue.config.productionTip = false;
+const app = createApp(App);
 
-new Vue({
-  render: (h) => h(App),
-  router: router,
-}).$mount("#app");
+app
+  .use(PrimeVue)
+  .component("AutoComplete", AutoComplete)
+  .component("Button", Button)
+  .component("Checkbox", Checkbox)
+  .component("Column", Column)
+  .component("DataTable", DataTable)
+  .component("Dialog", Dialog)
+  .component("InputText", InputText)
+  .component("Message", Message)
+  .component("MultiSelect", MultiSelect)
+  .component("PickList", PickList)
+  .component("Password", Password)
+  .component("SplitButton", SplitButton)
+  .component("Toast", Toast)
+  .component("ProgressBar", ProgressBar)
+  .use(ToastService)
+  .use(VueAxios, axios)
+  .use(router);
+
+app.mount("#app");
