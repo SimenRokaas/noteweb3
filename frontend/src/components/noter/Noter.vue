@@ -35,7 +35,6 @@
                   v-model="filters['global'].value"
                   placeholder="Fritekst søk"
                   size="40"
-                  @keyup="highlightMatches()"
                 />
                 <Checkbox
                   id="alleKolonner"
@@ -167,7 +166,11 @@
         :field="col.field"
         :header="col.header"
         sortable
-      />
+      >
+        <template #body="slotProps">
+          <div v-html="highlightMatches(slotProps.data[col.field])" />
+        </template>
+      </Column>
     </DataTable>
     <KolonnePicklist
       :erSynlig="visKolonneValgDialog"
@@ -363,7 +366,7 @@ export default {
       this.loading = false;
     });
     if (sessionStorage.search) {
-      this.filters["global"] = sessionStorage.search;
+      this.filters["global"].value = sessionStorage.search;
     }
   },
   methods: {
@@ -371,6 +374,7 @@ export default {
       this.filters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       };
+      sessionStorage.search = "";
     },
     onRowSelect(data) {
       this.arkNrNaa = data.ArkivNr;
@@ -380,37 +384,17 @@ export default {
       this.visAvbrytKnapp = true;
       this.visDialog = true;
     },
-    highlightMatches() {
-      let doReplace = true;
-      if (this.filters.global.value === undefined) {
-        this.initFilters();
+    highlightMatches(data) {
+      let currentSearch = this.filters.global.value;
+      if (currentSearch === null || currentSearch.length < 2) {
+        return data;
       }
-      sessionStorage.search = this.filters.global.value;
-      if (this.filters.global.value === "") {
-        // bug når sida er lasta med search-param: inputfelt v-model kobles av. Nullstiller objekt for reset.
-        this.initFilters();
-        doReplace = false;
+      sessionStorage.search = currentSearch;
+      if (data.toString().toLowerCase().includes(currentSearch.toLowerCase())) {
+        return data.replace(new RegExp(currentSearch, "ig"), "<mark>$&</mark>");
+      } else {
+        return data;
       }
-      const searchWords = doReplace ? this.filters.global.value.split(" ") : [];
-      const tabellen = document.querySelector(".p-datatable-tbody");
-      const tds = tabellen.getElementsByTagName("TD");
-      tds.forEach((td) => {
-        if (td.innerHTML.includes("<mark>")) {
-          td.innerHTML = td.innerHTML.replace(/<mark>(.*)<\/mark>/, "$1");
-        }
-        searchWords.forEach((word) => {
-          if (
-            word.length > 0 &&
-            td.textContent.toLowerCase().indexOf(word.toLowerCase()) !== -1
-          ) {
-            const wordEscaped = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-            td.innerHTML = td.innerHTML.replace(
-              new RegExp(wordEscaped, "i"),
-              "<mark>$&</mark>"
-            );
-          }
-        });
-      });
     },
     leggTilNote() {
       this.mode = "NY";
