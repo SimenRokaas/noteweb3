@@ -98,7 +98,7 @@ if (process.env.NODE_ENV !== "development") {
 }
 const port = process.env.port || 57462;
 app.set("port", port); // set express to use this port
-app.listen(port, () => {
+const server = app.listen(port, () => {
   if (typeof PhusionPassenger !== "undefined") {
     console.log("TJK Notearkiv server kjører i Passenger.");
   } else {
@@ -106,7 +106,8 @@ app.listen(port, () => {
   }
 });
 process.on("SIGTERM", () => {
-  app.close(() => {
+  server.close((err) => {
     console.log("TJK Notearkiv server er avsluttet.");
+    process.exit(err ? 1 : 0);
   });
 });
