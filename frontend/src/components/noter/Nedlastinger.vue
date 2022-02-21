@@ -1,6 +1,12 @@
 <template>
   <div>Nedlastinger</div>
-  <router-link to="Noter">Tilbake</router-link>
+  <Button
+    icon="pi pi-arrow-circle-left"
+    label="Tilbake"
+    @click="$router.back()"
+    style="margin-right: 4px"
+    class="p-button-warning"
+  />
 </template>
 
 <script>
