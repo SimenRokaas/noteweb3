@@ -7,7 +7,6 @@ const pool = require("../database");
 
 const apacheLog = "nedlastinger.log";
 let numLogLines = 0;
-let processedLogLines = 0;
 
 router.get("/parselog", auth.authMiddleware, (req, res) => {
   numLogLines = countLogLines();
@@ -45,44 +44,59 @@ function parseAccessLog(res) {
   const Alpine = require("alpine");
   const alpine = new Alpine();
 
-  processedLogLines = 0;
+  let loglines = [];
   alpine.parseReadStream(
     fs.createReadStream(apacheLog, { encoding: "utf8" }),
-    (data) => {
-      populateTable(data);
-      if (processedLogLines >= numLogLines) {
-        console.log(
-          "Prosessert " + processedLogLines + " linjer fra access-logg."
-        );
-        res.send(JSON.stringify(processedLogLines));
+    (logline) => {
+      loglines.push(record(logline));
+      if (loglines.length >= numLogLines) {
+        console.log("Parset " + loglines.length + " linjer fra access-logg.");
+        populateTable(loglines);
+        console.log("Lagret " + loglines.length + " linjer til database.");
+        res.send(JSON.stringify(loglines.length));
       }
     }
   );
 }
 
-function populateTable(data) {
-  pool.query("insert into noter_nedlastinger set ?", record(data), (error) => {
-    if (error) {
-      console.error(JSON.stringify(error));
-      throw error;
+function populateTable(loglines) {
+  const values = loglines.map(Object.values);
+  pool.query(
+    "insert into noter_nedlastinger (arkivnr, remoteHost, logname, remoteUser, time, request, status, size, referer, useragent) values ?",
+    [values],
+    (error) => {
+      if (error) {
+        console.error(JSON.stringify(error));
+        throw error;
+      }
     }
-  });
-  processedLogLines++;
+  );
 }
 
 function record(data) {
   return {
-    arkivnr: 0,
-    remoteHost: blankIfNull(data.remoteHost),
-    logname: blankIfNull(data.logname),
-    remoteUser: blankIfNull(data.remoteUser),
-    time: blankIfNull(apacheLogTimeToMysqlDatetime(data.time)), // UTC
-    request: blankIfNull(data.request),
-    status: blankIfNull(data.status),
-    size: blankIfNull(data.sizeCLF),
-    referer: blankIfNull("data.RequestHeader Referer"),
-    useragent: blankIfNull("data.RequestHeader User-agent"),
+    arkivnr: blankIfNull(getArkivNr(data["request"])),
+    remoteHost: blankIfNull(data["remoteHost"]),
+    logname: blankIfNull(data["logname"]),
+    remoteUser: blankIfNull(data["remoteUser"]),
+    time: blankIfNull(apacheLogTimeToMysqlDatetime(data["time"])), // UTC
+    request: blankIfNull(data["request"]),
+    status: blankIfNull(data["status"]),
+    size: blankIfNull(data["sizeCLF"]),
+    referer: blankIfNull(data["RequestHeader Referer"]),
+    useragent: blankIfNull(data["RequestHeader User-agent"]),
   };
+}
+
+function getArkivNr(req) {
+  // eksempel: ...Arkivnr%201701-1800/1706%20Kjempevisesl%c3%a5tten/
+  // => arkivnr = 1706
+  const pattern = /Arkivnr%20(\d{4}-\d{4})\/(\d{4})/;
+  const match = req.match(pattern);
+  if (match == null || match.size < 3) {
+    return 0;
+  }
+  return match[2];
 }
 
 function apacheLogTimeToMysqlDatetime(apacheLogTime) {
