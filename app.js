@@ -86,6 +86,7 @@ passport.deserializeUser((id, done) => {
 // routes for the app
 app.use("/auth", require("./routes/auth").router);
 app.use("/arkiv", require("./routes/arkiv"));
+app.use("/nedlastinger", require("./routes/nedlastinger"));
 
 console.log("Env: " + process.env.NODE_ENV);
 if (process.env.NODE_ENV !== "development") {
@@ -95,7 +96,12 @@ if (process.env.NODE_ENV !== "development") {
   app.get("/", (req, res) => {
     res.sendFile("index.html", { root: publicRoot });
   });
+  //The 404 Route (ALWAYS Keep this as the last route)
+  app.get("*", function (req, res) {
+    res.sendFile("index.html", { root: publicRoot });
+  });
 }
+
 const port = process.env.port || 57462;
 app.set("port", port); // set express to use this port
 const server = app.listen(port, () => {

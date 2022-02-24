@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "alpine": "^0.2.1",
     "axios": "^0.25.0",
     "body-parser": "^1.19.1",
     "cheerio": "^1.0.0-rc.10",
