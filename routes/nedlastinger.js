@@ -23,6 +23,20 @@ router.get("/parselog", auth.authMiddleware, (req, res) => {
   parseAccessLog(res);
 });
 
+router.get("/list", auth.authMiddleware, (req, res) => {
+  pool.query(
+    "select nl.arkivnr, n.tittel1, n.komponist, n.arrangor, date_format(nl.time, '%Y.%m.%d %H:%i:%s') as time " +
+      "from noter_nedlastinger nl, noter n where nl.arkivnr = n.arkivnr and nl.status = 200 " +
+      "order by nl.time desc",
+    (error, nedlastinger) => {
+      if (error) {
+        console.error(error);
+      }
+      res.send(nedlastinger);
+    }
+  );
+});
+
 function countLogLines() {
   const { execSync } = require("child_process");
   const count = execSync("cat " + apacheLog + " | wc -l");

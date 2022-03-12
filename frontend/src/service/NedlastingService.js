@@ -7,4 +7,10 @@ export default class NedlastingService {
       .then((res) => res.data)
       .catch((err) => console.log(err));
   }
+
+  static fetchNedlastinger() {
+    return Api()
+      .get("/nedlastinger/list")
+      .then((res) => res.data);
+  }
 }

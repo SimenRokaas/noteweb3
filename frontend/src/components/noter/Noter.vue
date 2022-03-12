@@ -439,7 +439,6 @@ export default {
       this.skannedeNoter = [];
     },
     onVisAlleKolonner() {
-      console.log("Flagg: " + this.visAlleKolonner);
       if (this.visAlleKolonner) {
         this.valgteKolonnerBackup = this.valgteKolonner;
         this.valgteKolonner = allCols;
