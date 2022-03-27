@@ -1,17 +1,20 @@
 <template>
-  <h3>Nedlastinger</h3>
+  <span style="vertical-align: top; font-weight: bold; font-size: large">
+    Nedlastinger
+  </span>
   <Button
     icon="pi pi-arrow-circle-left"
     label="Tilbake"
     @click="$router.push({ name: 'Noter' })"
-    style="margin-right: 4px"
+    style="margin-right: 4px; margin-left: 10px; margin-bottom: 10px"
     class="p-button-warning"
   />
   <Button
+    v-if="kanSkrive"
     icon="pi pi-database"
     label="Parse logg"
     @click="parseLog()"
-    style="margin-right: 4px"
+    style="margin-right: 4px; margin-bottom: 10px"
     class="p-button-success"
   />
   <DataTable
@@ -144,6 +147,8 @@ export default {
     return {
       numLogLines: 0,
       loading: true,
+      kanLese: false,
+      kanSkrive: false,
       nedlastinger: [],
       fra: null,
       til: null,
@@ -169,6 +174,14 @@ export default {
     AuthService.user().then((user) => {
       if (user === undefined) {
         this.$router.push({ name: "Login" });
+      }
+      if (user.rolle === "les") {
+        this.kanLese = true;
+        this.kanSkrive = false;
+      }
+      if (user.rolle === "skriv") {
+        this.kanLese = true;
+        this.kanSkrive = true;
       }
     });
     this.fra = "01.01." + new Date().getFullYear();
