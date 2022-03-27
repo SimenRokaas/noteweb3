@@ -76,7 +76,7 @@ app
       weekHeader: "Uke",
       firstDayOfWeek: 1,
       dateFormat: "dd/mm/yy",
-    }
+    },
   })
   .component("AutoComplete", AutoComplete)
   .component("Button", Button)
