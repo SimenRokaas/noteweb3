@@ -24,10 +24,25 @@ router.get("/parselog", auth.authMiddleware, (req, res) => {
 });
 
 router.get("/list", auth.authMiddleware, (req, res) => {
+  const fra = req.query.fra;
+  const til = req.query.til;
+  const aggrSett = req.query.aggrSett;
+  let fileSelectPart = aggrSett === "true" ? "" : "nl.file, ";
+  let fileGroupByPart = aggrSett === "true" ? "" : "file, ";
+  console.log("fileSelectPart = " + fileSelectPart);
+  console.log("fileGroupByPart = " + fileGroupByPart);
   pool.query(
-    "select nl.arkivnr, n.tittel1, n.komponist, n.arrangor, date_format(nl.time, '%Y.%m.%d %H:%i:%s') as time " +
-      "from noter_nedlastinger nl, noter n where nl.arkivnr = n.arkivnr and nl.status = 200 " +
-      "order by nl.time desc",
+    "  select nl.arkivnr, " +
+      fileSelectPart +
+      "n.tittel1, n.komponist, n.arrangor, count(*) as antall from noter_nedlastinger nl, noter n" +
+      "    where nl.arkivnr = n.arkivnr and status = 200" +
+      "    and nl.time between '" +
+      fra +
+      "' and '" +
+      til +
+      "' group by arkivnr, " +
+      fileGroupByPart +
+      "tittel1, komponist, arrangor order by antall desc",
     (error, nedlastinger) => {
       if (error) {
         console.error(error);
@@ -76,7 +91,7 @@ function parseAccessLog(res) {
 function populateTable(loglines) {
   const values = loglines.map(Object.values);
   pool.query(
-    "insert into noter_nedlastinger (arkivnr, remoteHost, logname, remoteUser, time, request, status, size, referer, useragent) values ?",
+    "insert into noter_nedlastinger (arkivnr, file, remoteHost, logname, remoteUser, time, request, status, size, referer, useragent) values ?",
     [values],
     (error) => {
       if (error) {
@@ -88,8 +103,10 @@ function populateTable(loglines) {
 }
 
 function record(data) {
+  let reqParts = getReqParts(data["request"]);
   return {
-    arkivnr: blankIfNull(getArkivNr(data["request"])),
+    arkivnr: blankIfNull(reqParts.arkivnr),
+    file: blankIfNull(reqParts.pdf),
     remoteHost: blankIfNull(data["remoteHost"]),
     logname: blankIfNull(data["logname"]),
     remoteUser: blankIfNull(data["remoteUser"]),
@@ -102,15 +119,30 @@ function record(data) {
   };
 }
 
-function getArkivNr(req) {
-  // eksempel: ...Arkivnr%201701-1800/1706%20Kjempevisesl%c3%a5tten/
-  // => arkivnr = 1706
-  const pattern = /Arkivnr%20(\d{4}-\d{4})\/(\d{4})/;
-  const match = req.match(pattern);
-  if (match == null || match.size < 3) {
-    return 0;
+function getReqParts(req) {
+  // eksempel:  GET /TJK-medlem/02%20Noteskann/83%20Arkivnr%201601-1700/1674%20Rhapsody%20for%20flute/Rhapsody%20for%20flute%20soloflute.pdf HTTP/1.1
+  const path = req.substr("GET ".length).split(" ")[0];
+  if (!path.includes(".pdf")) {
+    console.log("Fant ikke path!! Req: " + req);
+    return {};
   }
-  return match[2];
+
+  // finner arkivnr
+  const match = path.match(/Arkivnr%20(\d*-\d*)\/(\d{4})/);
+  if (match == null || match.size < 3) {
+    console.log("Fant ikke match! " + match);
+    return {};
+  }
+  const arkivnr = match[2];
+
+  // finner pdf
+  const pdf = decodeURIComponent(
+    path.substr(path.lastIndexOf("/") + 1).slice(0, -4)
+  );
+  return {
+    arkivnr: arkivnr,
+    pdf: pdf,
+  };
 }
 
 function apacheLogTimeToMysqlDatetime(apacheLogTime) {

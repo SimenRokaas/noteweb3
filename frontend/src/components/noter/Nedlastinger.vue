@@ -53,15 +53,47 @@
               id="alleKolonner"
               v-model="visAlleKolonner"
               :binary="true"
-              style="margin-bottom: 5px; margin-left: 4px"
+              style="margin-bottom: 5px; margin-left: 10px"
               v-on:change="onVisAlleKolonner()"
             />
             <label
               for="alleKolonner"
               class="p-checkbox-label"
-              style="font-size: 14px; margin-right: 4px"
+              style="font-size: 14px; margin-right: 40px"
             >
               Vis/søk i alle kolonner
+            </label>
+            <label for="fra" style="font-size: 14px; margin-right: 4px">
+              Periode
+            </label>
+            <Calendar
+              id="fra"
+              v-model="fra"
+              dateFormat="dd.mm.yy"
+              style="width: 135px"
+              :showIcon="true"
+            />
+            <label for="til" style="font-size: 14px; margin: 4px">-</label>
+            <Calendar
+              id="til"
+              v-model="til"
+              dateFormat="dd.mm.yy"
+              style="width: 135px"
+              :showIcon="true"
+            />
+            <Checkbox
+              id="aggrSett"
+              v-model="aggrSett"
+              :binary="true"
+              style="margin-bottom: 5px; margin-left: 20px"
+              v-on:change="updateDownloads()"
+            />
+            <label
+              for="aggrSett"
+              class="p-checkbox-label"
+              style="font-size: 14px; margin-right: 40px"
+            >
+              Aggregert på sett
             </label>
           </td>
         </tr>
@@ -70,7 +102,7 @@
     <template #empty> Ingen treff. </template>
     <template #loading> Henter nedlastinger, vent litt... </template>
     <Column
-      v-for="col of valgteKolonner"
+      v-for="col of valgteKolonner.filter((clm) => filterColumn(clm))"
       :key="col.field"
       :field="col.field"
       :header="col.header"
@@ -89,14 +121,22 @@ import AuthService from "@/service/AuthService";
 import { FilterMatchMode } from "primevue/api";
 
 const kolArkivnr = { field: "arkivnr", header: "Arkivnr" };
+const kolFil = { field: "file", header: "Fil" };
 const kolTittel = { field: "tittel1", header: "Tittel" };
 const kolKomponist = { field: "komponist", header: "Komponist" };
 const kolArrangor = { field: "arrangor", header: "Arrangør" };
-const kolTid = { field: "time", header: "Tid" };
+const kolAntall = { field: "antall", header: "Antall" };
 
-const minCols = [kolArkivnr, kolTittel, kolTid];
+const minCols = [kolAntall, kolArkivnr, kolTittel, kolFil];
 
-const allCols = [kolArkivnr, kolTittel, kolKomponist, kolArrangor, kolTid];
+const allCols = [
+  kolAntall,
+  kolArkivnr,
+  kolTittel,
+  kolFil,
+  kolKomponist,
+  kolArrangor,
+];
 
 export default {
   name: "Nedlastinger",
@@ -105,14 +145,25 @@ export default {
       numLogLines: 0,
       loading: true,
       nedlastinger: [],
+      fra: null,
+      til: null,
       valgteKolonner: minCols,
       valgteKolonnerBackup: minCols,
       visAlleKolonner: false,
+      aggrSett: false,
       filters: null,
     };
   },
   created() {
     this.initFilters();
+  },
+  watch: {
+    fra() {
+      this.updateDownloads();
+    },
+    til() {
+      this.updateDownloads();
+    },
   },
   mounted() {
     AuthService.user().then((user) => {
@@ -120,10 +171,9 @@ export default {
         this.$router.push({ name: "Login" });
       }
     });
-    NedlastingService.fetchNedlastinger().then((data) => {
-      this.nedlastinger = data;
-      this.loading = false;
-    });
+    this.fra = "01.01." + new Date().getFullYear();
+    this.til = "31.12." + new Date().getFullYear();
+    this.updateDownloads();
     if (sessionStorage.search) {
       this.filters["global"].value = sessionStorage.search;
     }
@@ -134,6 +184,17 @@ export default {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       };
       sessionStorage.search = "";
+    },
+    updateDownloads() {
+      this.loading = true;
+      NedlastingService.fetchNedlastinger({
+        fra: this.fra,
+        til: this.til,
+        aggrSett: this.aggrSett,
+      }).then((data) => {
+        this.nedlastinger = data;
+        this.loading = false;
+      });
     },
     parseLog() {
       NedlastingService.parseLog()
@@ -184,6 +245,9 @@ export default {
       setTimeout(() => {
         this.highlightMatches();
       }, 500);
+    },
+    filterColumn(column) {
+      return !(column.field === "file" && this.aggrSett);
     },
   },
 };

@@ -8,9 +8,15 @@ export default class NedlastingService {
       .catch((err) => console.log(err));
   }
 
-  static fetchNedlastinger() {
+  static fetchNedlastinger(params) {
     return Api()
-      .get("/nedlastinger/list")
+      .get("/nedlastinger/list", {
+        params: {
+          fra: params.fra,
+          til: params.til,
+          aggrSett: params.aggrSett,
+        },
+      })
       .then((res) => res.data);
   }
 }
