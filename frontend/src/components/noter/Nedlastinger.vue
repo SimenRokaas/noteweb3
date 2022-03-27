@@ -3,7 +3,7 @@
   <Button
     icon="pi pi-arrow-circle-left"
     label="Tilbake"
-    @click="$router.back()"
+    @click="$router.push({ name: 'Noter' })"
     style="margin-right: 4px"
     class="p-button-warning"
   />
@@ -198,8 +198,13 @@ export default {
     },
     parseLog() {
       NedlastingService.parseLog()
-        .then((res) => this.handleSuccess(res, "Logg er lest inn"))
+        .then((res) => {
+          this.handleSuccess(res, "Logg er lest inn");
+        })
         .catch((error) => this.handleError(error));
+      setTimeout(() => {
+        this.updateDownloads();
+      }, 500);
     },
     handleSuccess(res, text) {
       this.numLogLines = res;
